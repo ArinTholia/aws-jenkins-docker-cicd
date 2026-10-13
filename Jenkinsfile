@@ -9,7 +9,7 @@ pipeline {
         IMAGE_NAME     = "cloudpulse-cicd"
         CONTAINER_NAME = "cloudpulse-app"
         APP_PORT       = "3000"
-        AWS_REGION     = "ap-south-1"
+        AWS_REGION     = "us-east-1"
     }
 
     stages {
@@ -72,16 +72,17 @@ pipeline {
         // --------------------------------------------------------------------
         stage('4. Deploy Container on AWS EC2') {
             steps {
-                echo "🚀 Deploying new Docker container on AWS EC2 port ${APP_PORT}..."
+                echo "🚀 Deploying new Docker container on AWS EC2 (Port 80 & Port ${APP_PORT})..."
                 sh '''
                     # Stop and remove previous container if running
                     docker stop ${CONTAINER_NAME} || true
                     docker rm ${CONTAINER_NAME} || true
 
-                    # Run the newly built container with automatic restart policy
+                    # Run the newly built container on BOTH Port 80 and Port 3000
                     docker run -d \
                         --name ${CONTAINER_NAME} \
                         --restart unless-stopped \
+                        -p 80:3000 \
                         -p ${APP_PORT}:3000 \
                         ${IMAGE_NAME}:${BUILD_NUMBER}
                 '''
@@ -105,13 +106,12 @@ pipeline {
 
     post {
         success {
-            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2 Port ${APP_PORT}!"
+            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2!"
         }
         failure {
             echo "❌ FAILURE: Pipeline failed during Build #${BUILD_NUMBER}. Check logs above."
         }
         always {
-            // Clean up dangling Docker images to save disk space on AWS Free Tier
             sh 'docker image prune -f || true'
         }
     }
