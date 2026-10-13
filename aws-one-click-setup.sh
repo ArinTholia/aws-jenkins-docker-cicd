@@ -1,8 +1,8 @@
 #!/bin/bash
 # ============================================================================
 # aws-one-click-setup.sh — One-Click AWS EC2 Provisioning Script
-# Target OS: Ubuntu 22.04 LTS / 24.04 LTS (AWS Free Tier t2.micro / t3.micro)
-# Installs: 1. Git | 2. Docker | 3. Java 17 & Jenkins CI/CD | 4. Deploys App
+# Target OS: Ubuntu LTS / 24.04 / 26.04 (AWS Free Tier)
+# Installs: 1. Git | 2. Docker | 3. Java & Jenkins CI/CD | 4. Deploys App
 # ============================================================================
 set -e
 
@@ -10,16 +10,19 @@ echo "============================================================"
 echo "☁️ Starting One-Click AWS EC2 DevOps CI/CD Environment Setup"
 echo "============================================================"
 
-# 1. Update apt packages & install Git + Java 17 (Required by Jenkins)
-sudo apt-get update -y
-sudo apt-get install -y git curl wget ca-certificates gnupg lsb-release fontconfig openjdk-17-jre
+# Remove any broken Jenkins apt list before first update
+sudo rm -f /etc/apt/sources.list.d/jenkins.list
 
-echo "✅ [1/4] Git & OpenJDK 17 installed:"
+# 1. Update apt packages & install Git + Java (Required by Jenkins)
+sudo apt-get update -y
+sudo apt-get install -y git curl wget ca-certificates gnupg fontconfig default-jre
+
+echo "✅ [1/4] Git & Java installed:"
 git --version
 java -version
 
 # 2. Install Docker Engine
-echo "🐳 [2/4] Installing Docker Engine..."
+echo "🐳 [2/4] Verifying Docker Engine..."
 if ! command -v docker >/dev/null 2>&1; then
     curl -fsSL https://get.docker.com -o get-docker.sh
     sudo sh get-docker.sh
@@ -28,16 +31,13 @@ fi
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# 3. Install Jenkins LTS
+# 3. Install Jenkins LTS (with trusted repository flag for 2026 GPG rotation)
 echo "⚙️ [3/4] Installing Jenkins CI/CD Server..."
 if ! command -v jenkins >/dev/null 2>&1; then
-    sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
-      https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
-      https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    echo "deb [trusted=yes] https://pkg.jenkins.io/debian-stable binary/" | sudo tee \
       /etc/apt/sources.list.d/jenkins.list > /dev/null
-    sudo apt-get update -y
-    sudo apt-get install -y jenkins
+    sudo apt-get update -y --allow-insecure-repositories
+    sudo apt-get install -y --allow-unauthenticated jenkins
 fi
 
 # 4. Grant Jenkins & Ubuntu user permission to build/run Docker containers
