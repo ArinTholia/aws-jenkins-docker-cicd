@@ -72,18 +72,17 @@ pipeline {
         // --------------------------------------------------------------------
         stage('4. Deploy Container on AWS EC2') {
             steps {
-                echo "🚀 Deploying new Docker container on AWS EC2 (Port 80 & Port ${APP_PORT})..."
+                echo "🚀 Deploying new Docker container on AWS EC2 using host network..."
                 sh '''
                     # Stop and remove previous container if running
                     docker stop ${CONTAINER_NAME} || true
                     docker rm ${CONTAINER_NAME} || true
 
-                    # Run the newly built container on BOTH Port 80 and Port 3000
+                    # Run container using host network (identical to Jenkins port 8080)
                     docker run -d \
                         --name ${CONTAINER_NAME} \
                         --restart unless-stopped \
-                        -p 80:3000 \
-                        -p ${APP_PORT}:3000 \
+                        --net=host \
                         ${IMAGE_NAME}:${BUILD_NUMBER}
                 '''
             }
@@ -106,7 +105,7 @@ pipeline {
 
     post {
         success {
-            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2!"
+            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2 Port ${APP_PORT}!"
         }
         failure {
             echo "❌ FAILURE: Pipeline failed during Build #${BUILD_NUMBER}. Check logs above."
