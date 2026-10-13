@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudPulse — Automated CI/CD Dynamic Web App (AWS + Git + Jenkins + Docker)</title>
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-hover: #18233c;
+      --border: #23304f;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --aws-orange: #ff9900;
+      --git-red: #f05032;
+      --jenkins-blue: #3b82f6;
+      --docker-cyan: #0db7ed;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --accent: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b, var(--bg-dark) 45%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 3rem;
+    }
+
+    /* Top Telemetry Navbar */
+    .navbar {
+      background: rgba(19, 27, 46, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--docker-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .health-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 0;
+    }
+
+    /* Live CI/CD Build Telemetry Banner (4 Mandatory Tools) */
+    .telemetry-banner {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .tool-aws::before { background: var(--aws-orange); }
+    .tool-git::before { background: var(--git-red); }
+    .tool-jenkins::before { background: var(--jenkins-blue); }
+    .tool-docker::before { background: var(--docker-cyan); }
+
+    .tool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .tool-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .tag-aws { background: rgba(255, 153, 0, 0.15); color: var(--aws-orange); }
+    .tag-git { background: rgba(240, 80, 50, 0.15); color: #ff7b63; }
+    .tag-jenkins { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+    .tag-docker { background: rgba(13, 183, 237, 0.15); color: #38bdf8; }
+
+    .tool-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: 'Consolas', monospace;
+      margin: 0.25rem 0;
+      color: #fff;
+    }
+
+    .tool-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* One-Click CI/CD Pipeline Visualizer Section */
+    .pipeline-panel {
+      background: linear-gradient(180deg, rgba(24, 35, 60, 0.9), rgba(19, 27, 46, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .pipeline-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pipeline-title h2 {
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pipeline-title p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .btn-oneclick {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.4rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    .btn-oneclick:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .btn-oneclick:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .pipeline-stages {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .stage-box {
+      background: rgba(11, 15, 25, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .stage-box.active {
+      border-color: var(--jenkins-blue);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .stage-box.done {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .stage-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .stage-box.done .stage-icon {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .stage-info h4 {
+      font-size: 0.88rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .stage-info span {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-family: 'Consolas', monospace;
+    }
+
+    .console-drawer {
+      margin-top: 1rem;
+      background: #070a12;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: 'Consolas', monospace;
+      font-size: 0.78rem;
+      color: #a7f3d0;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+      line-height: 1.5;
+    }
+
+    /* Main Content Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 960px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.35rem;
+    }
+
+    .panel-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 0.95rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b0f19;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 0.3rem;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #4f46e5;
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .stat-box {
+      background: rgba(11, 15, 25, 0.6);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    /* Filter Pills */
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      background: #0b0f19;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Task List */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .task-item {
+      background: rgba(11, 15, 25, 0.55);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .task-item:hover {
+      border-color: #3b4d7a;
+    }
+
+    .task-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 0.94rem;
+    }
+
+    .task-title.completed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.7rem;
+    }
+
+    .prio-High { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .prio-Medium { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .prio-Low { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+    .status-Completed { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .status-InProgress { background: rgba(59, 130, 246, 0.18); color: #60a5fa; }
+    .status-Pending { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #131b2e;
+      color: var(--text-main);
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-sm:hover {
+      background: #1e293b;
+    }
+
+    .btn-del {
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* Deployment Log Table */
+    .deploy-section {
+      margin-top: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mono {
+      font-family: 'Consolas', monospace;
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation & Live Health Status -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-logo">CP</div>
+      <div class="brand-title">
+        <h1>CloudPulse DevOps — Dynamic CI/CD Web Application</h1>
+        <p>Mandatory Stack: AWS Cloud • Git • Jenkins • Docker</p>
+      </div>
+    </div>
+    <div class="health-pill">
+      <span class="pulse-dot"></span>
+      <span id="healthText">Pipeline Status: HEALTHY (Port 3000)</span>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- 4 Mandatory Tools Live Telemetry Banner -->
+    <section class="telemetry-banner">
+      <div class="tool-card tool-aws">
+        <div class="tool-header">
+          <span class="tool-tag tag-aws">1. AWS Cloud</span>
+          <span style="font-size:0.75rem;color:var(--text-muted)">EC2 Host</span>
+        </div>
+        <div class="tool-value" id="awsHostVal">AWS EC2 Ubuntu</div>
+        <div class="tool-sub" id="awsRegionVal">Region: ap-south-1 / us-east-1</div>
+      </div>
+
+      <div class="tool-card tool-git">
+        <div class="tool-header">
+          <span class="tool-tag tag-git">2. Git & GitHub</span>
+          <span style="font-size:0.75rem;color:var(--text-muted)" id="gitBranchVal">Branch: main</span>
+        </div>
+        <div class="tool-value" id="gitCommitVal">#7f3a9c1</div>
+        <div class="tool-sub">Webhook Auto-Trigger Enabled</div>
+      </div>
+
+      <div class="tool-card tool-jenkins">
+        <div class="tool-header">
+          <span class="tool-tag tag-jenkins">3. Jenkins CI/CD</span>
+          <span style="font-size:0.75rem;color:#34d399">● Automated</span>
+        </div>
+        <div class="tool-value" id="jenkinsBuildVal">Build #1</div>
+        <div class="tool-sub">Declarative Pipeline (Jenkinsfile)</div>
+      </div>
+
+      <div class="tool-card tool-docker">
+        <div class="tool-header">
+          <span class="tool-tag tag-docker">4. Docker Engine</span>
+          <span style="font-size:0.75rem;color:var(--text-muted)" id="uptimeVal">Uptime: 0s</span>
+        </div>
+        <div class="tool-value" id="dockerContainerVal">Container: ...</div>
+        <div class="tool-sub">Image: cloudpulse-cicd:latest</div>
+      </div>
+    </section>
+
+    <!-- One-Click Automated CI/CD Pipeline Runner & Visualizer -->
+    <section class="pipeline-panel">
+      <div class="pipeline-top">
+        <div class="pipeline-title">
+          <h2>⚡ One-Click Automated CI/CD Pipeline Execution</h2>
+          <p>Demonstrate how a Git commit flows through Jenkins, builds a Docker image, and deploys on AWS EC2</p>
+        </div>
+        <button class="btn-oneclick" id="triggerPipelineBtn" onclick="runOneClickPipeline()">
+          <span>🚀 Trigger 1-Click CI/CD Deploy</span>
+        </button>
+      </div>
+
+      <div class="pipeline-stages">
+        <div class="stage-box done" id="stage-1">
+          <div class="stage-icon">1</div>
+          <div class="stage-info">
+            <h4>Git SCM Checkout</h4>
+            <span>git pull origin main</span>
+          </div>
+        </div>
+        <div class="stage-box done" id="stage-2">
+          <div class="stage-icon">2</div>
+          <div class="stage-info">
+            <h4>Jenkins CI Test</h4>
+            <span>npm test (Unit & API)</span>
+          </div>
+        </div>
+        <div class="stage-box done" id="stage-3">
+          <div class="stage-icon">3</div>
+          <div class="stage-info">
+            <h4>Docker Image Build</h4>
+            <span>docker build -t app:$BUILD</span>
+          </div>
+        </div>
+        <div class="stage-box done" id="stage-4">
+          <div class="stage-icon">4</div>
+          <div class="stage-info">
+            <h4>AWS EC2 Container Run</h4>
+            <span>docker run -d -p 3000:3000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="console-drawer" id="consoleDrawer"></div>
+    </section>
+
+    <!-- Dynamic Application Main Grid (Task CRUD + Live Stats) -->
+    <div class="main-grid">
+      <!-- Left: Create Dynamic Task Form -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>➕ Add Dynamic DevOps Task</span>
+        </div>
+        <form id="taskForm" onsubmit="createTask(event)">
+          <div class="form-group">
+            <label>Task Description *</label>
+            <input type="text" id="taskTitle" class="form-control" placeholder="e.g., Add Elastic IP to AWS EC2" required />
+          </div>
+          <div class="form-group">
+            <label>DevOps Tool Category</label>
+            <select id="taskCategory" class="form-control">
+              <option value="AWS Cloud">☁️ AWS Cloud</option>
+              <option value="Git & SCM">🌿 Git & SCM</option>
+              <option value="Jenkins CI/CD">⚙️ Jenkins CI/CD</option>
+              <option value="Docker">🐳 Docker</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority Level</label>
+            <select id="taskPriority" class="form-control">
+              <option value="High">🔥 High Priority</option>
+              <option value="Medium" selected>⚡ Medium Priority</option>
+              <option value="Low">🟢 Low Priority</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Assigned Engineer</label>
+            <input type="text" id="taskAssignee" class="form-control" placeholder="e.g., Release Engineer" value="DevOps Student" />
+          </div>
+          <button type="submit" class="btn-submit">Save Task to Dynamic Store</button>
+        </form>
+      </div>
+
+      <!-- Right: Live Task Board -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>📋 Live Project & Release Tracker (Dynamic CRUD)</span>
+          <span style="font-size:0.78rem;color:var(--text-muted)">REST API: <code>/api/tasks</code></span>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num" id="statTotal">0</div>
+            <div class="stat-label">Total Tasks</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" style="color:#34d399" id="statCompleted">0</div>
+            <div class="stat-label">Completed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" style="color:#60a5fa" id="statInProgress">0</div>
+            <div class="stat-label">In Progress</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" style="color:#fbbf24" id="statPending">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="setFilter('ALL', this)">All Tools</button>
+          <button class="filter-btn" onclick="setFilter('AWS Cloud', this)">AWS Cloud</button>
+          <button class="filter-btn" onclick="setFilter('Git & SCM', this)">Git & SCM</button>
+          <button class="filter-btn" onclick="setFilter('Jenkins CI/CD', this)">Jenkins CI/CD</button>
+          <button class="filter-btn" onclick="setFilter('Docker', this)">Docker</button>
+        </div>
+
+        <div class="task-list" id="taskList"></div>
+      </div>
+    </div>
+
+    <!-- Bottom: Automated Deployment History Table -->
+    <section class="panel deploy-section">
+      <div class="panel-title">
+        <span>📜 Automated Jenkins + Docker Deployment History on AWS</span>
+        <span style="font-size:0.78rem;color:var(--text-muted)">REST API: <code>/api/deployments</code></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Jenkins Build</th>
+              <th>Git Commit</th>
+              <th>Docker Container ID</th>
+              <th>Target Environment</th>
+              <th>Triggered By</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="deployTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    let allTasks = [];
+    let currentFilter = 'ALL';
+
+    async function loadBuildInfo() {
+      try {
+        const res = await fetch('/api/build-info');
+        const info = await res.json();
+        document.getElementById('awsHostVal').textContent = info.cloudProvider;
+        document.getElementById('awsRegionVal').textContent = `Region: ${info.awsRegion}`;
+        document.getElementById('gitCommitVal').textContent = `#${info.gitCommit}`;
+        document.getElementById('gitBranchVal').textContent = `Branch: ${info.gitBranch}`;
+        document.getElementById('jenkinsBuildVal').textContent = `Build #${info.buildNumber}`;
+        document.getElementById('dockerContainerVal').textContent = `ID: ${info.containerId}`;
+        document.getElementById('uptimeVal').textContent = `Uptime: ${info.uptimeSeconds}s`;
+      } catch (err) {
+        console.error('Failed to load build info:', err);
+      }
+    }
+
+    async function loadTasks() {
+      const res = await fetch('/api/tasks');
+      const data = await res.json();
+      allTasks = data.tasks;
+
+      document.getElementById('statTotal').textContent = data.stats.total;
+      document.getElementById('statCompleted').textContent = data.stats.completed;
+      document.getElementById('statInProgress').textContent = data.stats.inProgress;
+      document.getElementById('statPending').textContent = data.stats.pending;
+
+      renderTasks();
+    }
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      const filtered = currentFilter === 'ALL'
+        ? allTasks
+        : allTasks.filter(t => t.category === currentFilter);
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted)">No tasks found for this filter.</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(task => {
+        const statusClass = task.status.replace(/\s+/g, '');
+        const nextStatus = task.status === 'Pending'
+          ? 'In Progress'
+          : task.status === 'In Progress'
+            ? 'Completed'
+            : 'Pending';
+
+        return `
+          <div class="task-item">
+            <div class="task-left">
+              <div class="task-title ${task.status === 'Completed' ? 'completed' : ''}">${escapeHtml(task.title)}</div>
+              <div class="task-meta">
+                <span class="badge prio-${task.priority}">${task.priority}</span>
+                <span class="badge status-${statusClass}">${task.status}</span>
+                <span>🛠 ${escapeHtml(task.category)}</span>
+                <span>👤 ${escapeHtml(task.assignee)}</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button class="btn-sm" onclick="cycleStatus('${task.id}', '${nextStatus}')">
+                ↻ Mark ${nextStatus}
+              </button>
+              <button class="btn-sm btn-del" onclick="deleteTask('${task.id}')">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function createTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('taskTitle').value;
+      const category = document.getElementById('taskCategory').value;
+      const priority = document.getElementById('taskPriority').value;
+      const assignee = document.getElementById('taskAssignee').value;
+
+      await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, category, priority, assignee })
+      });
+
+      document.getElementById('taskTitle').value = '';
+      await loadTasks();
+    }
+
+    async function cycleStatus(id, status) {
+      await fetch(`/api/tasks/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      await loadTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      await loadTasks();
+    }
+
+    function setFilter(category, btn) {
+      currentFilter = category;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks();
+    }
+
+    async function loadDeployments() {
+      const res = await fetch('/api/deployments');
+      const deployments = await res.json();
+      const tbody = document.getElementById('deployTableBody');
+
+      tbody.innerHTML = deployments.map(d => `
+        <tr>
+          <td><strong>#${d.buildNumber}</strong></td>
+          <td class="mono">${d.commitHash} (${d.branch})</td>
+          <td class="mono">${d.containerId}</td>
+          <td>${d.environment}</td>
+          <td>${d.triggeredBy}</td>
+          <td>${d.duration}</td>
+          <td><span class="badge status-Completed">✔ ${d.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    async function runOneClickPipeline() {
+      const btn = document.getElementById('triggerPipelineBtn');
+      const drawer = document.getElementById('consoleDrawer');
+      btn.disabled = true;
+      drawer.style.display = 'block';
+      drawer.innerHTML = '';
+
+      const stages = ['stage-1', 'stage-2', 'stage-3', 'stage-4'];
+      stages.forEach(s => {
+        const el = document.getElementById(s);
+        el.classList.remove('done', 'active');
+      });
+
+      const logs = [
+        { stage: 0, msg: '[Git Webhook] Push event detected on branch refs/heads/main...' },
+        { stage: 0, msg: '[Jenkins] Checking out Git repository into workspace /var/lib/jenkins/workspace/cloudpulse...' },
+        { stage: 1, msg: '[Jenkins CI] Running automated test suite: npm test...' },
+        { stage: 1, msg: '[Jenkins CI] ✔ GET /health (200 OK) | ✔ POST /api/tasks (201 Created)' },
+        { stage: 2, msg: '[Docker] Building container image: docker build -t cloudpulse-cicd:$BUILD_NUMBER .' },
+        { stage: 2, msg: '[Docker] Image built and tagged successfully.' },
+        { stage: 3, msg: '[AWS EC2] Stopping old container & starting new container on Port 3000...' },
+        { stage: 3, msg: '[AWS EC2] Healthcheck verified! Zero-downtime deployment complete.' }
+      ];
+
+      for (let i = 0; i < logs.length; i++) {
+        const currentStageId = stages[logs[i].stage];
+        stages.forEach((s, idx) => {
+          const el = document.getElementById(s);
+          if (idx < logs[i].stage) {
+            el.classList.remove('active');
+            el.classList.add('done');
+          } else if (idx === logs[i].stage) {
+            el.classList.add('active');
+          }
+        });
+
+        drawer.innerHTML += `<div>> ${logs[i].msg}</div>`;
+        drawer.scrollTop = drawer.scrollHeight;
+        await new Promise(r => setTimeout(r, 450));
+      }
+
+      stages.forEach(s => {
+        const el = document.getElementById(s);
+        el.classList.remove('active');
+        el.classList.add('done');
+      });
+
+      const res = await fetch('/api/simulate-deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ triggeredBy: '1-Click Web Pipeline Trigger' })
+      });
+      const newDep = await res.json();
+
+      document.getElementById('jenkinsBuildVal').textContent = `Build #${newDep.buildNumber}`;
+      document.getElementById('gitCommitVal').textContent = `#${newDep.commitHash}`;
+      document.getElementById('dockerContainerVal').textContent = `ID: ${newDep.containerId}`;
+
+      await loadDeployments();
+      btn.disabled = false;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Initialize dashboard
+    loadBuildInfo();
+    loadTasks();
+    loadDeployments();
+    setInterval(loadBuildInfo, 5000);
+  </script>
+</body>
+</html>
