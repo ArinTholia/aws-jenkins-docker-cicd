@@ -20,5 +20,6 @@ call npm test
 
 echo.
 echo [3/3] Starting Dynamic Web Application on http://localhost:3000 ...
-start http://localhost:3000
-call npm start
+start "" cmd /c "timeout /t 2 /nobreak >nul & start http://localhost:3000"
+node server.js
+pause

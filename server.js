@@ -5,90 +5,114 @@ const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SERVER_START_TIME = new Date().toISOString();
 
-// Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Data file paths for dynamic persistence
 const DATA_DIR = path.join(__dirname, 'data');
-const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
-const DEPLOYMENTS_FILE = path.join(DATA_DIR, 'deployments.json');
+const MENU_FILE = path.join(DATA_DIR, 'menu.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 
-// Ensure data directory & initial seed data exist
+// Initialize Default Cafe Menu & Sample Orders
 function initDataStore() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  if (!fs.existsSync(TASKS_FILE)) {
-    const initialTasks = [
+  if (!fs.existsSync(MENU_FILE)) {
+    const initialMenu = [
       {
-        id: 'task-101',
-        title: 'Configure GitHub Webhook for Automated Trigger',
-        category: 'Git & SCM',
-        priority: 'High',
-        status: 'Completed',
-        assignee: 'DevOps Engineer',
-        createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
+        id: 'item-1',
+        name: 'Farmhouse Cheese Burst Pizza',
+        category: 'Pizza & Burgers',
+        price: 299,
+        rating: '4.9',
+        prepTime: '15 mins',
+        emoji: '🍕',
+        badge: 'Bestseller',
+        desc: 'Fresh mozzarella, bell peppers, sweet corn & Italian herbs on a crispy crust.'
       },
       {
-        id: 'task-102',
-        title: 'Create Declarative Jenkinsfile Pipeline Stages',
-        category: 'Jenkins CI/CD',
-        priority: 'High',
-        status: 'Completed',
-        assignee: 'Pipeline Lead',
-        createdAt: new Date(Date.now() - 86400000).toISOString()
+        id: 'item-2',
+        name: 'Crispy Peri-Peri Veg Burger',
+        category: 'Pizza & Burgers',
+        price: 169,
+        rating: '4.8',
+        prepTime: '10 mins',
+        emoji: '🍔',
+        badge: 'Chef Special',
+        desc: 'Crunchy herb patty topped with spicy peri-peri mayo, cheddar slice & lettuce.'
       },
       {
-        id: 'task-103',
-        title: 'Containerize Node.js App with Multi-Stage Dockerfile',
-        category: 'Docker',
-        priority: 'High',
-        status: 'Completed',
-        assignee: 'Container Specialist',
-        createdAt: new Date(Date.now() - 43200000).toISOString()
+        id: 'item-3',
+        name: 'Iced Caramel Cold Brew Latte',
+        category: 'Coffee & Drinks',
+        price: 149,
+        rating: '4.9',
+        prepTime: '5 mins',
+        emoji: '🧋',
+        badge: 'Must Try',
+        desc: '100% Arabica espresso blended with chilled milk and rich salted caramel.'
       },
       {
-        id: 'task-104',
-        title: 'Provision AWS EC2 Instance & Security Group Ports (22, 8080, 3000)',
-        category: 'AWS Cloud',
-        priority: 'High',
-        status: 'In Progress',
-        assignee: 'Cloud Architect',
-        createdAt: new Date(Date.now() - 7200000).toISOString()
+        id: 'item-4',
+        name: 'Hot Hazelnut Cappuccino',
+        category: 'Coffee & Drinks',
+        price: 129,
+        rating: '4.7',
+        prepTime: '5 mins',
+        emoji: '☕',
+        badge: 'Popular',
+        desc: 'Velvety steamed milk foam poured over freshly roasted hazelnut espresso.'
       },
       {
-        id: 'task-105',
-        title: 'Verify Zero-Downtime Container Replacement on Git Push',
-        category: 'AWS Cloud',
-        priority: 'Medium',
-        status: 'Pending',
-        assignee: 'QA Automation',
-        createdAt: new Date().toISOString()
+        id: 'item-5',
+        name: 'Belgian Chocolate Lava Cake',
+        category: 'Desserts',
+        price: 139,
+        rating: '5.0',
+        prepTime: '8 mins',
+        emoji: '🍰',
+        badge: 'Sweet Treat',
+        desc: 'Warm dark chocolate cake with a gooey molten chocolate center & vanilla scoop.'
+      },
+      {
+        id: 'item-6',
+        name: 'Loaded Cheesy Masala Fries',
+        category: 'Snacks',
+        price: 119,
+        rating: '4.8',
+        prepTime: '7 mins',
+        emoji: '🍟',
+        badge: 'Crispy',
+        desc: 'Golden French fries drizzled with liquid jalapeno cheese and tangy spices.'
       }
     ];
-    fs.writeFileSync(TASKS_FILE, JSON.stringify(initialTasks, null, 2));
+    fs.writeFileSync(MENU_FILE, JSON.stringify(initialMenu, null, 2));
   }
 
-  if (!fs.existsSync(DEPLOYMENTS_FILE)) {
-    const initialDeployments = [
+  if (!fs.existsSync(ORDERS_FILE)) {
+    const initialOrders = [
       {
-        id: 'dep-1',
-        buildNumber: process.env.BUILD_NUMBER || '1',
-        commitHash: (process.env.GIT_COMMIT || '7f3a9c1').substring(0, 7),
-        branch: process.env.GIT_BRANCH || 'main',
-        containerId: os.hostname().substring(0, 12),
-        environment: 'AWS EC2 Production',
-        status: 'SUCCESS',
-        duration: '18.4s',
-        triggeredBy: 'Git Push Webhook -> Jenkins',
-        timestamp: SERVER_START_TIME
+        id: 'ORD-101',
+        itemName: 'Farmhouse Cheese Burst Pizza',
+        emoji: '🍕',
+        price: 299,
+        customerName: 'Rahul (Table #4)',
+        status: 'Preparing',
+        orderedAt: 'Just now'
+      },
+      {
+        id: 'ORD-102',
+        itemName: 'Iced Caramel Cold Brew Latte',
+        emoji: '🧋',
+        price: 149,
+        customerName: 'Priya (Online Order)',
+        status: 'Out for Delivery',
+        orderedAt: '5 mins ago'
       }
     ];
-    fs.writeFileSync(DEPLOYMENTS_FILE, JSON.stringify(initialDeployments, null, 2));
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(initialOrders, null, 2));
   }
 }
 
@@ -103,151 +127,130 @@ function writeJson(filePath, data) {
 }
 
 // ============================================================================
-// 1. HEALTH CHECK ENDPOINT (Used by Jenkins Pipeline & Docker HEALTHCHECK)
+// 1. HEALTH CHECK & BUILD INFO (Used by Jenkins & Docker)
 // ============================================================================
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',
-    service: 'cloudpulse-devops-cicd',
-    buildNumber: process.env.BUILD_NUMBER || 'local-dev',
-    gitCommit: (process.env.GIT_COMMIT || 'local').substring(0, 7),
-    containerId: os.hostname(),
-    uptimeSeconds: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString()
+    service: 'cloudbite-cafe-cicd',
+    buildNumber: process.env.BUILD_NUMBER || '1',
+    gitCommit: (process.env.GIT_COMMIT || 'main').substring(0, 7),
+    containerId: os.hostname()
   });
 });
 
-// ============================================================================
-// 2. LIVE CI/CD BUILD & ENVIRONMENT TELEMETRY API
-// ============================================================================
 app.get('/api/build-info', (req, res) => {
   res.json({
-    appName: 'CloudPulse CI/CD',
-    version: '1.0.0',
-    buildNumber: process.env.BUILD_NUMBER || 'Local-Dev (#1)',
+    appName: 'CloudBite Cafe',
+    buildNumber: process.env.BUILD_NUMBER || '1',
     gitCommit: (process.env.GIT_COMMIT || '7f3a9c1').substring(0, 7),
-    gitBranch: process.env.GIT_BRANCH || 'main',
     containerId: os.hostname().substring(0, 12),
-    platform: `${os.type()} ${os.arch()}`,
-    cloudProvider: process.env.CLOUD_PROVIDER || 'AWS EC2 Cloud',
-    awsRegion: process.env.AWS_REGION || 'us-east-1 / ap-south-1',
-    nodeVersion: process.version,
-    uptimeSeconds: Math.floor(process.uptime()),
-    deployedAt: SERVER_START_TIME,
-    tools: ['AWS Cloud (EC2)', 'Git & GitHub', 'Jenkins CI/CD', 'Docker Engine']
+    cloudProvider: process.env.CLOUD_PROVIDER || 'AWS Cloud (EC2)',
+    tools: ['AWS Cloud (EC2)', 'Git & GitHub', 'Jenkins CI/CD', 'Docker']
   });
 });
 
 // ============================================================================
-// 3. DYNAMIC TASKS CRUD API
+// 2. CAFE MENU API (Browse & Add New Dishes Dynamically)
 // ============================================================================
-app.get('/api/tasks', (req, res) => {
-  const tasks = readJson(TASKS_FILE);
-  const stats = {
-    total: tasks.length,
-    completed: tasks.filter(t => t.status === 'Completed').length,
-    inProgress: tasks.filter(t => t.status === 'In Progress').length,
-    pending: tasks.filter(t => t.status === 'Pending').length,
-    highPriority: tasks.filter(t => t.priority === 'High').length
-  };
-  res.json({ tasks, stats });
+app.get('/api/menu', (req, res) => {
+  const menu = readJson(MENU_FILE);
+  res.json(menu);
 });
 
-app.post('/api/tasks', (req, res) => {
-  const { title, category, priority, assignee, status } = req.body;
-  if (!title || !title.trim()) {
-    return res.status(400).json({ error: 'Task title is required' });
+app.post('/api/menu', (req, res) => {
+  const { name, category, price, emoji, desc } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Dish name is required' });
   }
 
-  const tasks = readJson(TASKS_FILE);
-  const newTask = {
-    id: `task-${Date.now()}`,
-    title: title.trim(),
-    category: category || 'AWS Cloud',
-    priority: priority || 'Medium',
-    status: status || 'Pending',
-    assignee: assignee && assignee.trim() ? assignee.trim() : 'Student Dev',
-    createdAt: new Date().toISOString()
+  const menu = readJson(MENU_FILE);
+  const newDish = {
+    id: `item-${Date.now()}`,
+    name: name.trim(),
+    category: category || 'Pizza & Burgers',
+    price: Number(price) || 149,
+    rating: '4.9',
+    prepTime: '12 mins',
+    emoji: emoji || '🍽️',
+    badge: 'New Arrival',
+    desc: desc && desc.trim() ? desc.trim() : 'Freshly prepared signature dish added to our live menu.'
   };
 
-  tasks.unshift(newTask);
-  writeJson(TASKS_FILE, tasks);
-  res.status(201).json(newTask);
+  menu.unshift(newDish);
+  writeJson(MENU_FILE, menu);
+  res.status(201).json(newDish);
 });
 
-app.patch('/api/tasks/:id', (req, res) => {
-  const { id } = req.params;
-  const tasks = readJson(TASKS_FILE);
-  const index = tasks.findIndex(t => t.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Task not found' });
-  }
-
-  tasks[index] = {
-    ...tasks[index],
-    ...req.body,
-    id: tasks[index].id
-  };
-
-  writeJson(TASKS_FILE, tasks);
-  res.json(tasks[index]);
-});
-
-app.delete('/api/tasks/:id', (req, res) => {
-  const { id } = req.params;
-  const tasks = readJson(TASKS_FILE);
-  const filtered = tasks.filter(t => t.id !== id);
-
-  if (filtered.length === tasks.length) {
-    return res.status(404).json({ error: 'Task not found' });
-  }
-
-  writeJson(TASKS_FILE, filtered);
-  res.json({ deleted: true, id });
+app.delete('/api/menu/:id', (req, res) => {
+  const menu = readJson(MENU_FILE);
+  const filtered = menu.filter(item => item.id !== req.params.id);
+  writeJson(MENU_FILE, filtered);
+  res.json({ deleted: true });
 });
 
 // ============================================================================
-// 4. ONE-CLICK PIPELINE DEPLOYMENT SIMULATOR & HISTORY API
+// 3. 1-CLICK LIVE ORDERS API (Place Order, Update Status, Cancel)
 // ============================================================================
-app.get('/api/deployments', (req, res) => {
-  const deployments = readJson(DEPLOYMENTS_FILE);
-  res.json(deployments);
+app.get('/api/orders', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0), 0);
+  res.json({
+    orders,
+    stats: {
+      totalOrders: orders.length,
+      preparing: orders.filter(o => o.status === 'Preparing').length,
+      delivered: orders.filter(o => o.status === 'Delivered').length,
+      totalRevenue
+    }
+  });
 });
 
-app.post('/api/simulate-deploy', (req, res) => {
-  const deployments = readJson(DEPLOYMENTS_FILE);
-  const nextBuildNum = deployments.length + 1;
-  const randomHash = Math.random().toString(16).substring(2, 9);
-  const randomContainer = Math.random().toString(16).substring(2, 14);
+app.post('/api/orders', (req, res) => {
+  const { itemName, emoji, price, customerName } = req.body;
+  if (!itemName) {
+    return res.status(400).json({ error: 'Item name is required' });
+  }
 
-  const newDeployment = {
-    id: `dep-${Date.now()}`,
-    buildNumber: `${nextBuildNum}`,
-    commitHash: req.body.commitHash || randomHash,
-    branch: req.body.branch || 'main',
-    containerId: randomContainer,
-    environment: 'AWS EC2 (Docker Container)',
-    status: 'SUCCESS',
-    duration: `${(14 + Math.random() * 8).toFixed(1)}s`,
-    triggeredBy: req.body.triggeredBy || '1-Click Web Pipeline Trigger',
-    timestamp: new Date().toISOString()
+  const orders = readJson(ORDERS_FILE);
+  const randomOrderNum = Math.floor(100 + Math.random() * 900);
+  const newOrder = {
+    id: `ORD-${randomOrderNum}`,
+    itemName,
+    emoji: emoji || '🍔',
+    price: Number(price) || 149,
+    customerName: customerName && customerName.trim() ? customerName.trim() : 'Walk-in Customer',
+    status: 'Preparing',
+    orderedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   };
 
-  deployments.unshift(newDeployment);
-  writeJson(DEPLOYMENTS_FILE, deployments.slice(0, 15));
-  res.status(201).json(newDeployment);
+  orders.unshift(newOrder);
+  writeJson(ORDERS_FILE, orders);
+  res.status(201).json(newOrder);
 });
 
-// Start server only if run directly (allows importing app in automated unit tests)
+app.patch('/api/orders/:id', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const idx = orders.findIndex(o => o.id === req.params.id);
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  orders[idx].status = req.body.status || 'Delivered';
+  writeJson(ORDERS_FILE, orders);
+  res.json(orders[idx]);
+});
+
+app.delete('/api/orders/:id', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const filtered = orders.filter(o => o.id !== req.params.id);
+  writeJson(ORDERS_FILE, filtered);
+  res.json({ deleted: true });
+});
+
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`========================================================`);
-    console.log(`🚀 CloudPulse CI/CD Dynamic App running on port ${PORT}`);
-    console.log(`📦 Container ID : ${os.hostname()}`);
-    console.log(`🔨 Jenkins Build: ${process.env.BUILD_NUMBER || 'Local-Dev'}`);
-    console.log(`🌿 Git Commit   : ${process.env.GIT_COMMIT || 'Local-Commit'}`);
-    console.log(`🔗 URL          : http://localhost:${PORT}`);
+    console.log(`🍔 CloudBite Cafe Website running on http://localhost:${PORT}`);
     console.log(`========================================================`);
   });
 }

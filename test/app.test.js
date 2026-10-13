@@ -22,40 +22,37 @@ test.after(async () => {
   }
 });
 
-test('GET /health returns status UP and container telemetry', async () => {
+test('GET /health returns status UP', async () => {
   const res = await fetch(`${baseUrl}/health`);
   assert.strictEqual(res.status, 200);
   const body = await res.json();
   assert.strictEqual(body.status, 'UP');
-  assert.ok(body.containerId);
 });
 
-test('GET /api/build-info returns all 4 mandatory DevOps tools', async () => {
-  const res = await fetch(`${baseUrl}/api/build-info`);
+test('GET /api/menu returns cafe menu items', async () => {
+  const res = await fetch(`${baseUrl}/api/menu`);
   assert.strictEqual(res.status, 200);
-  const body = await res.json();
-  assert.strictEqual(body.appName, 'CloudPulse CI/CD');
-  assert.strictEqual(body.tools.length, 4);
+  const menu = await res.json();
+  assert.ok(Array.isArray(menu));
+  assert.ok(menu.length > 0);
 });
 
-test('POST and DELETE /api/tasks performs dynamic CRUD operations', async () => {
-  // 1. Create a task
-  const createRes = await fetch(`${baseUrl}/api/tasks`, {
+test('POST and DELETE /api/orders places and removes a 1-click food order', async () => {
+  const createRes = await fetch(`${baseUrl}/api/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      title: 'Automated Jenkins CI Test Task',
-      category: 'Jenkins CI/CD',
-      priority: 'High',
-      assignee: 'Jenkins Bot'
+      itemName: 'Test Cheese Pizza',
+      emoji: '🍕',
+      price: 299,
+      customerName: 'Jenkins Automated Test'
     })
   });
   assert.strictEqual(createRes.status, 201);
-  const created = await createRes.json();
-  assert.strictEqual(created.title, 'Automated Jenkins CI Test Task');
+  const order = await createRes.json();
+  assert.strictEqual(order.itemName, 'Test Cheese Pizza');
 
-  // 2. Delete the test task to keep store clean
-  const delRes = await fetch(`${baseUrl}/api/tasks/${created.id}`, {
+  const delRes = await fetch(`${baseUrl}/api/orders/${order.id}`, {
     method: 'DELETE'
   });
   assert.strictEqual(delRes.status, 200);
