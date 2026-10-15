@@ -8,7 +8,7 @@ pipeline {
     environment {
         IMAGE_NAME     = "cloudpulse-cicd"
         CONTAINER_NAME = "cloudpulse-app"
-        APP_PORT       = "3000"
+        APP_PORT       = "80"
         AWS_REGION     = "us-east-1"
     }
 
@@ -72,17 +72,17 @@ pipeline {
         // --------------------------------------------------------------------
         stage('4. Deploy Container on AWS EC2') {
             steps {
-                echo "🚀 Deploying new Docker container on AWS EC2 using host network..."
+                echo "🚀 Deploying new Docker container on AWS EC2 Port 80..."
                 sh '''
                     # Stop and remove previous container if running
                     docker stop ${CONTAINER_NAME} || true
                     docker rm ${CONTAINER_NAME} || true
 
-                    # Run container using host network (identical to Jenkins port 8080)
+                    # Run newly built container on Port 80
                     docker run -d \
                         --name ${CONTAINER_NAME} \
                         --restart unless-stopped \
-                        --net=host \
+                        -p 80:3000 \
                         ${IMAGE_NAME}:${BUILD_NUMBER}
                 '''
             }
@@ -96,7 +96,7 @@ pipeline {
                 echo "🩺 Verifying application health endpoint on AWS EC2..."
                 sh '''
                     sleep 3
-                    curl -f http://localhost:${APP_PORT}/health
+                    curl -f http://localhost:80/health || curl -f http://localhost:3000/health
                 '''
                 echo "✅ CI/CD Pipeline Deployment Successful!"
             }
@@ -105,7 +105,7 @@ pipeline {
 
     post {
         success {
-            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2 Port ${APP_PORT}!"
+            echo "🎉 SUCCESS: Build #${BUILD_NUMBER} (Commit ${env.GIT_COMMIT_SHORT}) is live on AWS EC2 Port 80!"
         }
         failure {
             echo "❌ FAILURE: Pipeline failed during Build #${BUILD_NUMBER}. Check logs above."

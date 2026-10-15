@@ -3,26 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudBite Cafe — 1-Click Online Food Ordering</title>
+  <title>CloudBite Cafe — Fresh Food Delivered Fast</title>
   <style>
     :root {
       --primary: #ff5a1f;
       --primary-hover: #e04812;
-      --bg-page: #fffaf5;
+      --primary-soft: #fff0eb;
+      --bg-page: #fbf9f6;
       --bg-card: #ffffff;
-      --text-dark: #1e293b;
+      --text-dark: #0f172a;
       --text-muted: #64748b;
       --border: #f1e4d8;
+      --border-light: #f5ede6;
       --green: #16a34a;
+      --green-soft: #dcfce7;
       --blue: #2563eb;
+      --blue-soft: #dbeafe;
       --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     body {
@@ -31,13 +39,14 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Top Navigation Bar */
     .navbar {
       background: #ffffff;
       border-bottom: 1px solid var(--border);
-      padding: 0.9rem 2rem;
+      padding: 0.85rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -46,35 +55,63 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
     }
 
     .brand-icon {
-      font-size: 2rem;
-      background: #fff0eb;
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+      font-size: 1.8rem;
+      background: var(--primary-soft);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .brand h1 {
-      font-size: 1.35rem;
+    .brand-title h1 {
+      font-size: 1.3rem;
       font-weight: 800;
+      letter-spacing: -0.3px;
       color: var(--text-dark);
     }
 
-    .brand p {
-      font-size: 0.8rem;
+    .brand-title p {
+      font-size: 0.76rem;
       color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
     }
 
     .nav-right {
@@ -84,241 +121,169 @@
       flex-wrap: wrap;
     }
 
-    .btn-teacher {
-      background: linear-gradient(135deg, #1e293b, #334155);
-      color: #fff;
-      border: none;
-      padding: 0.55rem 1.1rem;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.84rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
-      transition: transform 0.15s;
-    }
-
-    .btn-teacher:hover {
-      transform: translateY(-1px);
-      background: #0f172a;
-    }
-
     .customer-box {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      padding: 0.4rem 0.75rem;
-      border-radius: 10px;
-      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+    }
+
+    .customer-box span {
+      color: var(--text-muted);
     }
 
     .customer-box input {
       border: none;
       background: transparent;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-dark);
       outline: none;
-      width: 115px;
+      width: 100px;
     }
 
     .order-badge {
       background: var(--primary);
       color: #fff;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 1.1rem;
       border-radius: 999px;
       font-weight: 700;
-      font-size: 0.85rem;
-      box-shadow: 0 4px 12px rgba(255, 90, 31, 0.25);
-    }
-
-    /* Teacher 4-Tools Proof Drawer */
-    .teacher-drawer {
-      display: none;
-      background: #0f172a;
-      color: #f8fafc;
-      border-bottom: 3px solid var(--primary);
-      padding: 1.75rem 2rem;
-    }
-
-    .teacher-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-
-    .teacher-top {
+      font-size: 0.84rem;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
+      gap: 0.45rem;
+      box-shadow: 0 4px 14px rgba(255, 90, 31, 0.28);
     }
 
-    .teacher-top h3 {
-      font-size: 1.25rem;
-      color: #fff;
-    }
-
-    .teacher-top p {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-top: 0.2rem;
-    }
-
-    .btn-pipeline-run {
-      background: linear-gradient(135deg, #2563eb, #06b6d4);
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.3rem;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.88rem;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-    }
-
-    .tools-4-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .t-card {
-      background: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 12px;
-      padding: 1.1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .t-card:hover, .t-card.active-tool {
-      border-color: #38bdf8;
-      background: #26354d;
-    }
-
-    .t-card.step-done {
-      border-color: #22c55e;
-    }
-
-    .t-card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-      font-weight: 800;
-      font-size: 0.98rem;
-    }
-
-    .t-status {
-      font-size: 0.72rem;
-      background: rgba(34, 197, 94, 0.2);
-      color: #4ade80;
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
-    }
-
-    .t-card p {
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      line-height: 1.4;
-      margin-bottom: 0.65rem;
-    }
-
-    .t-btn-code {
-      font-size: 0.76rem;
-      color: #38bdf8;
-      font-weight: 700;
-      text-decoration: underline;
-    }
-
-    .code-viewer-box {
-      background: #020617;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 1rem;
-      font-family: 'Consolas', monospace;
-      font-size: 0.8rem;
-      color: #e2e8f0;
-      max-height: 240px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-    }
-
-    /* Hero Banner */
+    /* Hero Section */
     .hero {
-      background: linear-gradient(135deg, #ff5a1f 0%, #ff8c42 100%);
+      background: linear-gradient(135deg, #ff5a1f 0%, #ff7e39 100%);
       color: white;
-      padding: 2.2rem 2rem;
+      padding: 3rem 2rem 2.75rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      max-width: 780px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(8px);
+      padding: 0.35rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
     }
 
     .hero h2 {
-      font-size: 1.9rem;
+      font-size: 2.3rem;
       font-weight: 800;
-      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 0.85rem;
     }
 
     .hero p {
-      font-size: 1rem;
+      font-size: 1.05rem;
       opacity: 0.95;
-      max-width: 650px;
-      margin: 0 auto;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
     }
 
-    /* Main Content Layout */
+    .hero-features {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .hero-feat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 0, 0, 0.12);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+    }
+
+    /* Main Container */
     .container {
       max-width: 1280px;
       width: 100%;
       margin: 0 auto;
-      padding: 1.75rem 1.5rem;
+      padding: 2rem 1.5rem;
       flex: 1;
     }
 
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 390px;
-      gap: 1.75rem;
-      align-items: start;
-    }
-
-    @media (max-width: 980px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Section Header & Filter Buttons */
-    .section-header {
+    /* Search & Filter Header */
+    .catalog-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
 
-    .section-header h3 {
-      font-size: 1.3rem;
+    .catalog-title h3 {
+      font-size: 1.4rem;
       font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .catalog-title p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      width: 260px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+      width: 100%;
     }
 
     .filter-bar {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      margin-bottom: 1.5rem;
     }
 
     .filter-btn {
-      background: #fff;
+      background: #ffffff;
       border: 1px solid var(--border);
       color: var(--text-dark);
-      padding: 0.45rem 0.95rem;
+      padding: 0.5rem 1.1rem;
       border-radius: 999px;
       font-size: 0.84rem;
       font-weight: 600;
@@ -332,8 +297,23 @@
 
     .filter-btn.active {
       background: var(--primary);
-      color: #fff;
+      color: #ffffff;
       border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(255, 90, 31, 0.2);
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Food Menu Grid */
@@ -346,26 +326,25 @@
     .food-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem;
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
       transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
     }
 
     .food-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(255, 90, 31, 0.1);
+      box-shadow: 0 12px 28px rgba(255, 90, 31, 0.1);
     }
 
     .food-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.85rem;
     }
 
     .food-emoji {
@@ -373,33 +352,35 @@
       background: #fff7ed;
       width: 68px;
       height: 68px;
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .food-badge {
-      background: #fef3c7;
-      color: #b45309;
+      background: var(--amber-soft);
+      color: var(--amber);
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 0.25rem 0.6rem;
+      padding: 0.25rem 0.65rem;
       border-radius: 999px;
       text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
     .food-name {
-      font-size: 1.08rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
+      font-size: 1.1rem;
+      font-weight: 750;
+      letter-spacing: -0.2px;
+      margin-bottom: 0.4rem;
     }
 
     .food-desc {
       font-size: 0.82rem;
       color: var(--text-muted);
       line-height: 1.45;
-      margin-bottom: 0.9rem;
+      margin-bottom: 0.95rem;
     }
 
     .food-meta {
@@ -408,19 +389,19 @@
       font-size: 0.78rem;
       color: var(--text-muted);
       font-weight: 600;
-      margin-bottom: 1rem;
+      margin-bottom: 1.1rem;
     }
 
     .food-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 0.85rem;
+      padding-top: 0.9rem;
       border-top: 1px dashed var(--border);
     }
 
     .food-price {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: var(--text-dark);
     }
@@ -429,12 +410,16 @@
       background: var(--primary);
       color: white;
       border: none;
-      padding: 0.6rem 1.1rem;
-      border-radius: 10px;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
       transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(255, 90, 31, 0.25);
     }
 
     .btn-order:hover {
@@ -445,7 +430,7 @@
       transform: scale(0.96);
     }
 
-    /* Right Sidebar Cards */
+    /* Right Sidebar */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -455,17 +440,17 @@
     .panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.35rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
     }
 
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.85rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -474,25 +459,43 @@
       font-weight: 800;
     }
 
-    /* Stats Summary inside Live Orders */
+    .pulse-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .green-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    /* Mini Stats */
     .mini-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
+      gap: 0.65rem;
       margin-bottom: 1rem;
     }
 
     .mini-stat {
-      background: #fff7ed;
-      border-radius: 10px;
-      padding: 0.6rem;
+      background: var(--primary-soft);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.5rem;
       text-align: center;
     }
 
     .mini-stat strong {
       display: block;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       color: var(--primary);
+      font-weight: 800;
     }
 
     .mini-stat span {
@@ -501,23 +504,23 @@
       font-weight: 600;
     }
 
-    /* Live Order List */
+    /* Live Orders List */
     .orders-list {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      max-height: 360px;
+      max-height: 380px;
       overflow-y: auto;
     }
 
     .order-item {
-      background: #fcfaf8;
+      background: #faf8f5;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.85rem;
+      border-radius: var(--radius-md);
+      padding: 0.9rem;
       display: flex;
       flex-direction: column;
-      gap: 0.55rem;
+      gap: 0.6rem;
     }
 
     .order-row1 {
@@ -528,13 +531,13 @@
 
     .order-title {
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
     }
 
     .order-price {
       font-weight: 800;
       color: var(--primary);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
 
     .order-row2 {
@@ -546,32 +549,33 @@
     }
 
     .status-pill {
-      padding: 0.2rem 0.55rem;
+      padding: 0.2rem 0.6rem;
       border-radius: 6px;
       font-weight: 700;
       font-size: 0.72rem;
     }
 
-    .st-Preparing { background: #fef3c7; color: #b45309; }
-    .st-OutforDelivery { background: #dbeafe; color: #1d4ed8; }
-    .st-Delivered { background: #dcfce7; color: #15803d; }
+    .st-Preparing { background: var(--amber-soft); color: var(--amber); }
+    .st-OutforDelivery { background: var(--blue-soft); color: var(--blue); }
+    .st-Delivered { background: var(--green-soft); color: var(--green); }
 
     .order-actions {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.45rem;
       margin-top: 0.2rem;
     }
 
     .btn-small {
       flex: 1;
-      padding: 0.4rem 0.6rem;
-      border-radius: 6px;
+      padding: 0.45rem 0.7rem;
+      border-radius: var(--radius-sm);
       border: 1px solid #e2e8f0;
-      background: #fff;
+      background: #ffffff;
       font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       color: var(--text-dark);
+      transition: background 0.15s;
     }
 
     .btn-small:hover {
@@ -581,11 +585,12 @@
     .btn-cancel {
       flex: 0;
       color: #ef4444;
+      padding: 0.45rem 0.75rem;
     }
 
-    /* Add New Dish Form */
+    /* Add Dish Panel */
     .form-group {
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.85rem;
     }
 
     .form-group label {
@@ -593,16 +598,17 @@
       font-size: 0.78rem;
       font-weight: 700;
       color: var(--text-muted);
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.35rem;
     }
 
     .form-input {
       width: 100%;
-      padding: 0.6rem 0.8rem;
+      padding: 0.65rem 0.85rem;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-size: 0.85rem;
       outline: none;
+      transition: border-color 0.15s;
     }
 
     .form-input:focus {
@@ -612,40 +618,43 @@
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
+      gap: 0.65rem;
     }
 
     .btn-add-dish {
       width: 100%;
-      background: #1e293b;
+      background: var(--text-dark);
       color: white;
       border: none;
-      padding: 0.7rem;
-      border-radius: 8px;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
       font-weight: 700;
       font-size: 0.88rem;
       cursor: pointer;
-      margin-top: 0.25rem;
+      margin-top: 0.35rem;
+      transition: background 0.15s;
     }
 
     .btn-add-dish:hover {
-      background: #0f172a;
+      background: #000000;
     }
 
     /* Toast Notification */
     .toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #16a34a;
+      bottom: 28px;
+      right: 28px;
+      background: #0f172a;
       color: white;
-      padding: 0.9rem 1.4rem;
-      border-radius: 12px;
+      padding: 0.95rem 1.5rem;
+      border-radius: var(--radius-md);
       font-weight: 700;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
       display: none;
       z-index: 999;
       animation: slideUp 0.25s ease-out;
+      border-left: 4px solid var(--primary);
     }
 
     @keyframes slideUp {
@@ -653,37 +662,80 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Simple DevOps Footer Strip for Teacher Evaluation */
-    .devops-footer {
-      background: #1e293b;
-      color: #f8fafc;
-      padding: 1.1rem 2rem;
-      margin-top: 2rem;
-      font-size: 0.82rem;
+    /* Realistic Food Website Footer */
+    .site-footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 3rem 2rem 2rem;
+      margin-top: 3.5rem;
+      font-size: 0.84rem;
     }
 
-    .devops-footer-inner {
+    .footer-inner {
       max-width: 1280px;
       margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    @media (max-width: 820px) {
+      .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+      }
+    }
+
+    .footer-brand h4 {
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-brand p {
+      line-height: 1.6;
+      max-width: 320px;
+    }
+
+    .footer-col h5 {
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-col a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-col a:hover {
+      color: var(--primary);
+    }
+
+    .footer-bottom {
+      max-width: 1280px;
+      margin: 1.5rem auto 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
-    }
-
-    .tool-pills {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-
-    .tool-pill {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      font-weight: 600;
+      font-size: 0.78rem;
     }
   </style>
 </head>
@@ -691,123 +743,95 @@
 
   <!-- Top Navbar -->
   <nav class="navbar">
-    <div class="brand">
+    <a href="#" class="brand">
       <div class="brand-icon">🍔</div>
-      <div>
+      <div class="brand-title">
         <h1>CloudBite Cafe</h1>
-        <p>1-Click Online Food Ordering Website</p>
+        <p>Craft Burgers, Artisan Pizzas & Fresh Brews</p>
       </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="#menu" class="nav-link active">Menu</a>
+      <a href="#orders" class="nav-link">Live Kitchen</a>
+      <a href="#add-dish" class="nav-link">Add Special</a>
     </div>
 
     <div class="nav-right">
-      <button class="btn-teacher" onclick="toggleTeacherDrawer()">
-        🎓 Show 4 DevOps Tools (Teacher Proof)
-      </button>
       <div class="customer-box">
-        <span>👤 Name:</span>
+        <span>👤 Order for:</span>
         <input type="text" id="customerNameInput" value="Arint" placeholder="Your name" />
       </div>
       <div class="order-badge" id="navOrderCount">
-        🛒 Live Orders: 0
+        🛍️ Live Orders (0)
       </div>
     </div>
   </nav>
 
-  <!-- Expandable Teacher 4-Tools Proof Panel -->
-  <section class="teacher-drawer" id="teacherDrawer">
-    <div class="teacher-inner">
-      <div class="teacher-top">
-        <div>
-          <h3>🎓 Teacher Evaluation View — How All 4 Mandatory DevOps Tools Power This Website</h3>
-          <p>Click any tool below to inspect the real project code/commits, or click "Run 1-Click Pipeline" to demonstrate the automated flow.</p>
-        </div>
-        <button class="btn-pipeline-run" id="runPipelineBtn" onclick="animatePipelineForTeacher()">
-          🚀 Run 1-Click CI/CD Pipeline Demo
-        </button>
-      </div>
-
-      <div class="tools-4-grid">
-        <div class="t-card active-tool" id="tcard-git" onclick="showToolProof('git')">
-          <div class="t-card-head">
-            <span>1️⃣ Git (Version Control)</span>
-            <span class="t-status" id="tstat-git">✔ Active</span>
-          </div>
-          <p>Tracks all website code changes (`server.js`, `index.html`) on branch <code>main</code> and triggers Jenkins automatically.</p>
-          <span class="t-btn-code">🔍 Click to view live Git commits</span>
-        </div>
-
-        <div class="t-card" id="tcard-jenkins" onclick="showToolProof('jenkins')">
-          <div class="t-card-head">
-            <span>2️⃣ Jenkins (CI/CD Pipeline)</span>
-            <span class="t-status" id="tstat-jenkins">✔ Automated</span>
-          </div>
-          <p>Automatically pulls code from Git, runs automated unit tests (`npm test`), and builds the Docker container.</p>
-          <span class="t-btn-code">🔍 Click to view real Jenkinsfile</span>
-        </div>
-
-        <div class="t-card" id="tcard-docker" onclick="showToolProof('docker')">
-          <div class="t-card-head">
-            <span>3️⃣ Docker (Containerization)</span>
-            <span class="t-status" id="tstat-docker">✔ Port 3000</span>
-          </div>
-          <p>Packages the Cafe website & Node.js runtime into a portable container image with automatic health checks.</p>
-          <span class="t-btn-code">🔍 Click to view real Dockerfile</span>
-        </div>
-
-        <div class="t-card" id="tcard-aws" onclick="showToolProof('aws')">
-          <div class="t-card-head">
-            <span>4️⃣ AWS Cloud (EC2 Server)</span>
-            <span class="t-status" id="tstat-aws">✔ Cloud Ready</span>
-          </div>
-          <p>Hosts Jenkins (`:8080`) and the live Docker container (`:3000`) on an AWS EC2 Ubuntu cloud instance.</p>
-          <span class="t-btn-code">🔍 Click to view AWS 1-Click Setup Script</span>
-        </div>
-      </div>
-
-      <div class="code-viewer-box" id="proofCodeBox">Loading live DevOps proof from project files...</div>
-    </div>
-  </section>
-
   <!-- Hero Section -->
   <header class="hero">
-    <h2>Fresh & Hot Food — Ordered in Just 1 Click! 🍕☕</h2>
-    <p>Click "1-Click Order" on any dish below to send it straight to the live kitchen tracker, or add your own custom dish to the menu!</p>
+    <div class="hero-content">
+      <span class="hero-badge">🔥 Instant 1-Click Ordering</span>
+      <h2>Artisan Pizzas, Handcrafted Burgers & Chilled Cold Brews</h2>
+      <p>Fast, fresh & prepared to perfection. Pick your favorite dish from our live menu below and click "1-Click Order" to send it straight to our kitchen!</p>
+      <div class="hero-features">
+        <div class="hero-feat-item">⚡ 15-Min Delivery Guarantee</div>
+        <div class="hero-feat-item">🌱 100% Fresh Ingredients</div>
+        <div class="hero-feat-item">🛵 Live Kitchen Tracker</div>
+      </div>
+    </div>
   </header>
 
-  <!-- Main Content -->
-  <div class="container">
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Catalog Controls: Title, Search, Filters -->
+    <div class="catalog-header" id="menu">
+      <div class="catalog-title">
+        <h3>Today's Fresh Specials</h3>
+        <p>Prepared hot on order with farm-fresh produce and authentic recipes.</p>
+      </div>
+
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="Search pizza, burger, coffee..." oninput="onSearchChange()" />
+      </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterMenu('ALL', this)">All Items</button>
+      <button class="filter-btn" onclick="filterMenu('Pizza & Burgers', this)">🍕 Pizza & Burgers</button>
+      <button class="filter-btn" onclick="filterMenu('Coffee & Drinks', this)">☕ Coffee & Drinks</button>
+      <button class="filter-btn" onclick="filterMenu('Desserts', this)">🍰 Desserts</button>
+      <button class="filter-btn" onclick="filterMenu('Snacks', this)">🍟 Snacks</button>
+    </div>
+
+    <!-- Main 2-Column Grid -->
     <div class="main-grid">
 
-      <!-- Left Column: Cafe Menu -->
+      <!-- Left Column: Menu Cards -->
       <div>
-        <div class="section-header">
-          <h3>🍽️ Today's Fresh Menu</h3>
-          <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterMenu('ALL', this)">All Items</button>
-            <button class="filter-btn" onclick="filterMenu('Pizza & Burgers', this)">🍕 Pizza & Burgers</button>
-            <button class="filter-btn" onclick="filterMenu('Coffee & Drinks', this)">☕ Coffee & Drinks</button>
-            <button class="filter-btn" onclick="filterMenu('Desserts', this)">🍰 Desserts</button>
-            <button class="filter-btn" onclick="filterMenu('Snacks', this)">🍟 Snacks</button>
-          </div>
-        </div>
-
         <div class="menu-grid" id="menuGrid"></div>
       </div>
 
-      <!-- Right Column: Live Orders & Add New Dish -->
+      <!-- Right Column: Live Kitchen Tracker & Manager Add Dish -->
       <aside class="sidebar">
 
         <!-- Card 1: Live Kitchen Orders -->
-        <div class="panel">
+        <div class="panel" id="orders">
           <div class="panel-header">
-            <h4>📦 Live Kitchen Orders</h4>
-            <span style="font-size:0.75rem;color:var(--green);font-weight:700">● Live Updates</span>
+            <h4>📦 Live Kitchen Tracker</h4>
+            <div class="pulse-indicator">
+              <span class="green-dot"></span>
+              <span>Kitchen Live</span>
+            </div>
           </div>
 
           <div class="mini-stats">
             <div class="mini-stat">
               <strong id="statTotalOrders">0</strong>
-              <span>Orders</span>
+              <span>Total Orders</span>
             </div>
             <div class="mini-stat">
               <strong id="statPreparing">0</strong>
@@ -822,16 +846,16 @@
           <div class="orders-list" id="ordersList"></div>
         </div>
 
-        <!-- Card 2: Add New Dish to Menu -->
-        <div class="panel">
+        <!-- Card 2: Add New Dish to Menu (Manager Feature) -->
+        <div class="panel" id="add-dish">
           <div class="panel-header">
-            <h4>➕ Add New Dish to Menu</h4>
-            <span style="font-size:0.75rem;color:var(--text-muted)">Admin / Manager</span>
+            <h4>➕ Add Special Dish to Menu</h4>
+            <span style="font-size:0.75rem;color:var(--text-muted);font-weight:600">Chef & Manager</span>
           </div>
           <form onsubmit="addNewDish(event)">
             <div class="form-group">
               <label>Dish Name *</label>
-              <input type="text" id="dishName" class="form-input" placeholder="e.g., Paneer Tikka Pizza" required />
+              <input type="text" id="dishName" class="form-input" placeholder="e.g., Truffle Mushroom Pizza" required />
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -846,8 +870,8 @@
                   <option value="☕">☕ Coffee</option>
                   <option value="🧋">🧋 Cold Drink</option>
                   <option value="🍰">🍰 Dessert</option>
-                  <option value="🍟">🍟 Fries / Snack</option>
-                  <option value="🍜">🍜 Noodles</option>
+                  <option value="🍟">🍟 Fries & Sides</option>
+                  <option value="🍜">🍜 Noodles & Bowls</option>
                 </select>
               </div>
             </div>
@@ -860,116 +884,69 @@
                 <option value="Snacks">Snacks</option>
               </select>
             </div>
-            <button type="submit" class="btn-add-dish">+ Add Dish to Live Menu</button>
+            <button type="submit" class="btn-add-dish">+ Add to Live Menu</button>
           </form>
         </div>
 
       </aside>
     </div>
-  </div>
+  </main>
 
-  <!-- Toast Popup -->
+  <!-- Toast Notification Popup -->
   <div class="toast" id="toastBox">✅ Order placed!</div>
 
-  <!-- Clean DevOps Project Bar at Bottom (For Teacher Check) -->
-  <footer class="devops-footer">
-    <div class="devops-footer-inner">
-      <div>
-        <strong>🎓 Automated CI/CD Dynamic Web App Project</strong>
+  <!-- Realistic Food Ordering Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h4>🍔 CloudBite Cafe</h4>
+        <p>Serving premium wood-fired pizzas, gourmet smash burgers, and fresh specialty coffee crafted by passionate baristas.</p>
       </div>
-      <div class="tool-pills">
-        <span class="tool-pill">☁️ 1. AWS Cloud (EC2)</span>
-        <span class="tool-pill">🌿 2. Git & GitHub</span>
-        <span class="tool-pill">⚙️ 3. Jenkins Pipeline (Build #<span id="footerBuild">1</span>)</span>
-        <span class="tool-pill">🐳 4. Docker Container (<span id="footerContainer">local</span>)</span>
+
+      <div class="footer-col">
+        <h5>Quick Links</h5>
+        <ul>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#orders">Kitchen Orders</a></li>
+          <li><a href="#add-dish">Add Special</a></li>
+        </ul>
       </div>
+
+      <div class="footer-col">
+        <h5>Cafe Hours</h5>
+        <ul>
+          <li>Mon – Fri: 8:00 AM – 11:30 PM</li>
+          <li>Sat – Sun: 9:00 AM – 12:00 AM</li>
+          <li>Delivery: 24/7 Available</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Customer Support</h5>
+        <ul>
+          <li>📞 1800-266-FOOD</li>
+          <li>✉️ support@cloudbite.cafe</li>
+          <li>📍 Main High Street, Food Court</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 CloudBite Cafe. All rights reserved.</span>
+      <span>Made with fresh ingredients & automated delivery.</span>
     </div>
   </footer>
 
   <script>
     let menuItems = [];
     let selectedCategory = 'ALL';
-    let devopsProofData = null;
+    let searchQuery = '';
 
     function showToast(msg) {
       const t = document.getElementById('toastBox');
       t.textContent = msg;
       t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 2600);
-    }
-
-    async function toggleTeacherDrawer() {
-      const drawer = document.getElementById('teacherDrawer');
-      if (drawer.style.display === 'block') {
-        drawer.style.display = 'none';
-        return;
-      }
-      drawer.style.display = 'block';
-      if (!devopsProofData) {
-        const res = await fetch('/api/devops-proof');
-        devopsProofData = await res.json();
-      }
-      showToolProof('git');
-    }
-
-    function showToolProof(tool) {
-      document.querySelectorAll('.t-card').forEach(c => c.classList.remove('active-tool'));
-      document.getElementById(`tcard-${tool}`).classList.add('active-tool');
-      const box = document.getElementById('proofCodeBox');
-      if (!devopsProofData) return;
-
-      if (tool === 'git') {
-        box.textContent =
-          `=== TOOL #1: LIVE GIT REPOSITORY PROOF ===\n` +
-          `Active Branch : ${devopsProofData.git.branch}\n` +
-          `Latest Commit : ${devopsProofData.git.commit}\n\n` +
-          `Recent Git Commits (git log --oneline):\n` +
-          `${devopsProofData.git.recentCommits}`;
-      } else if (tool === 'jenkins') {
-        box.textContent =
-          `=== TOOL #2: REAL JENKINSFILE PIPELINE (Jenkinsfile) ===\n\n` +
-          devopsProofData.jenkins.pipelineFile;
-      } else if (tool === 'docker') {
-        box.textContent =
-          `=== TOOL #3: REAL DOCKERFILE (Dockerfile) ===\n` +
-          `Active Host/Container ID: ${devopsProofData.docker.containerId}\n\n` +
-          devopsProofData.docker.dockerfile;
-      } else if (tool === 'aws') {
-        box.textContent =
-          `=== TOOL #4: AWS EC2 ONE-CLICK SETUP SCRIPT (aws-one-click-setup.sh) ===\n` +
-          `Target Instance : ${devopsProofData.aws.provider}\n` +
-          `Open Ports      : ${devopsProofData.aws.ports}\n\n` +
-          devopsProofData.aws.setupScript;
-      }
-    }
-
-    async function animatePipelineForTeacher() {
-      const btn = document.getElementById('runPipelineBtn');
-      const box = document.getElementById('proofCodeBox');
-      btn.disabled = true;
-      box.textContent = 'Starting Automated CI/CD Pipeline across all 4 tools...\n';
-
-      const steps = [
-        { id: 'git', msg: '✔ [1/4 Git] Developer pushed code to GitHub branch "main". Webhook triggered Jenkins!' },
-        { id: 'jenkins', msg: '✔ [2/4 Jenkins] Jenkins Pipeline Stage "Run Automated Tests" executed `npm test` (3/3 Passed)!' },
-        { id: 'docker', msg: '✔ [3/4 Docker] Jenkins built Docker image `docker build -t cloudpulse-cicd:latest .`!' },
-        { id: 'aws', msg: '✔ [4/4 AWS Cloud] Deployed Docker container on AWS EC2 Port 3000 & verified `/health` (200 OK)!' }
-      ];
-
-      document.querySelectorAll('.t-card').forEach(c => c.classList.remove('active-tool', 'step-done'));
-
-      for (const s of steps) {
-        const card = document.getElementById(`tcard-${s.id}`);
-        card.classList.add('active-tool');
-        box.textContent += `\n> ${s.msg}\n`;
-        await new Promise(r => setTimeout(r, 700));
-        card.classList.remove('active-tool');
-        card.classList.add('step-done');
-      }
-
-      box.textContent += `\n🎉 SUCCESS: All 4 mandatory tools (Git + Jenkins + Docker + AWS Cloud) completed deployment!`;
-      showToast('🚀 1-Click CI/CD Pipeline Demo Complete!');
-      btn.disabled = false;
     }
 
     async function loadMenu() {
@@ -980,9 +957,27 @@
 
     function renderMenu() {
       const grid = document.getElementById('menuGrid');
-      const items = selectedCategory === 'ALL'
+      let items = selectedCategory === 'ALL'
         ? menuItems
         : menuItems.filter(i => i.category === selectedCategory);
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        items = items.filter(i =>
+          i.name.toLowerCase().includes(q) ||
+          i.desc.toLowerCase().includes(q) ||
+          i.category.toLowerCase().includes(q)
+        );
+      }
+
+      if (items.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1;text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">🍽️</div>
+          <strong>No dishes found matching your search.</strong>
+          <p style="font-size:0.85rem;margin-top:0.3rem">Try another keyword or category!</p>
+        </div>`;
+        return;
+      }
 
       grid.innerHTML = items.map(item => `
         <div class="food-card">
@@ -1016,6 +1011,11 @@
       renderMenu();
     }
 
+    function onSearchChange() {
+      searchQuery = document.getElementById('searchInput').value;
+      renderMenu();
+    }
+
     async function placeOneClickOrder(itemName, emoji, price) {
       const customerName = document.getElementById('customerNameInput').value || 'Guest';
       await fetch('/api/orders', {
@@ -1023,7 +1023,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemName, emoji, price, customerName })
       });
-      showToast(`🎉 Ordered ${emoji} ${itemName} for ${customerName}!`);
+      showToast(`🎉 Order Placed! ${emoji} ${itemName} for ${customerName}`);
       await loadOrders();
     }
 
@@ -1031,14 +1031,17 @@
       const res = await fetch('/api/orders');
       const data = await res.json();
 
-      document.getElementById('navOrderCount').textContent = `🛒 Live Orders: ${data.stats.totalOrders}`;
+      document.getElementById('navOrderCount').textContent = `🛍️ Live Orders (${data.stats.totalOrders})`;
       document.getElementById('statTotalOrders').textContent = data.stats.totalOrders;
       document.getElementById('statPreparing').textContent = data.stats.preparing;
       document.getElementById('statRevenue').textContent = `₹${data.stats.totalRevenue}`;
 
       const list = document.getElementById('ordersList');
       if (data.orders.length === 0) {
-        list.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted)">No active orders yet. Click "1-Click Order" on any dish!</div>`;
+        list.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--text-muted)">
+          <div style="font-size:2rem;margin-bottom:0.4rem">🛒</div>
+          No active orders yet.<br>Click "1-Click Order" on any dish!
+        </div>`;
         return;
       }
 
@@ -1064,7 +1067,7 @@
               <button class="btn-small" onclick="updateOrderStatus('${o.id}', '${nextStatus}')">
                 ↻ Mark "${nextStatus}"
               </button>
-              <button class="btn-small btn-cancel" onclick="deleteOrder('${o.id}')" title="Remove Order">✕</button>
+              <button class="btn-small btn-cancel" onclick="deleteOrder('${o.id}')" title="Cancel Order">✕</button>
             </div>
           </div>
         `;
@@ -1103,18 +1106,8 @@
       await loadMenu();
     }
 
-    async function loadBuildFooter() {
-      try {
-        const res = await fetch('/api/build-info');
-        const info = await res.json();
-        document.getElementById('footerBuild').textContent = info.buildNumber;
-        document.getElementById('footerContainer').textContent = info.containerId;
-      } catch (e) {}
-    }
-
     loadMenu();
     loadOrders();
-    loadBuildFooter();
   </script>
 </body>
 </html>
