@@ -1,16 +1,16 @@
 version: "3.8"
 
 services:
-  cloudpulse-app:
+  cloudbite-cafe:
     build:
       context: .
       args:
-        BUILD_NUMBER: "${BUILD_NUMBER:-1}"
-        GIT_COMMIT: "${GIT_COMMIT:-main-docker}"
+        BUILD_NUMBER: "1"
+        GIT_COMMIT: "desktop-local"
         GIT_BRANCH: "main"
-        CLOUD_PROVIDER: "AWS EC2 (Docker Compose)"
-        AWS_REGION: "ap-south-1"
-    container_name: cloudpulse-app
+        CLOUD_PROVIDER: "Docker Desktop (Windows)"
+        AWS_REGION: "localhost"
+    container_name: cloudbite-cafe-app
     ports:
       - "3000:3000"
     restart: unless-stopped
