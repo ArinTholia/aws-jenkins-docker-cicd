@@ -1,7 +1,7 @@
 @echo off
-title CloudPulse - 1-Click Dynamic CI/CD Web Application
+title CloudBite Cafe - 1-Click Dynamic Web Application
 echo ============================================================
-echo   CloudPulse DevOps Project (AWS + Git + Jenkins + Docker)
+echo   CloudBite Cafe (AWS Cloud + Git + Jenkins + Docker)
 echo ============================================================
 echo.
 
