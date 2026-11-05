@@ -755,9 +755,13 @@
       <a href="#menu" class="nav-link active">Menu</a>
       <a href="#orders" class="nav-link">Live Kitchen</a>
       <a href="#add-dish" class="nav-link">Add Special</a>
+      <a href="/login" class="nav-link">Login</a>
     </div>
 
     <div class="nav-right">
+      <div id="authNavArea">
+        <a href="/login" style="background:#1e293b;color:#fff;padding:0.45rem 0.85rem;border-radius:8px;font-size:0.82rem;font-weight:700;text-decoration:none;display:inline-block">🔐 Login</a>
+      </div>
       <div class="customer-box">
         <span>👤 Order for:</span>
         <input type="text" id="customerNameInput" value="Arint" placeholder="Your name" />
@@ -1106,8 +1110,38 @@
       await loadMenu();
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    function checkAuth() {
+      const userJson = localStorage.getItem('cloudbite_user');
+      const authArea = document.getElementById('authNavArea');
+      if (userJson) {
+        try {
+          const user = JSON.parse(userJson);
+          if (user && user.name) {
+            document.getElementById('customerNameInput').value = user.name;
+            authArea.innerHTML = `
+              <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:700">
+                <span>👋 ${escapeHtml(user.name)} <small style="background:#f1f5f9;padding:0.15rem 0.45rem;border-radius:4px;color:var(--primary)">${escapeHtml(user.role || 'Customer')}</small></span>
+                <button onclick="logout()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;text-decoration:underline">Logout</button>
+              </div>
+            `;
+          }
+        } catch(e){}
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('cloudbite_user');
+      window.location.reload();
+    }
+
     loadMenu();
     loadOrders();
+    checkAuth();
   </script>
 </body>
 </html>

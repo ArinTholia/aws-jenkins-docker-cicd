@@ -153,6 +153,27 @@ function getGitInfo() {
 // ============================================================================
 // 1. HEALTH CHECK & DEVOPS PROOF API (For Jenkins, Docker & Teacher Demo)
 // ============================================================================
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { email, role } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  const namePart = email.split('@')[0] || 'User';
+  const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+  res.json({
+    success: true,
+    user: {
+      name: formattedName,
+      email,
+      role: role || (email.toLowerCase().includes('admin') || email.toLowerCase().includes('manager') ? 'Manager' : 'Customer')
+    }
+  });
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',

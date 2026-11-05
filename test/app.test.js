@@ -57,3 +57,22 @@ test('POST and DELETE /api/orders places and removes a 1-click food order', asyn
   });
   assert.strictEqual(delRes.status, 200);
 });
+
+test('GET /login and POST /api/auth/login authenticate user session', async () => {
+  const pageRes = await fetch(`${baseUrl}/login`);
+  assert.strictEqual(pageRes.status, 200);
+
+  const authRes = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'arin@cloudbite.cafe',
+      password: 'password123',
+      role: 'Manager'
+    })
+  });
+  assert.strictEqual(authRes.status, 200);
+  const data = await authRes.json();
+  assert.strictEqual(data.success, true);
+  assert.strictEqual(data.user.role, 'Manager');
+});

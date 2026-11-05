@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — CloudBite Cafe</title>
+  <style>
+    :root {
+      --primary: #ff5a1f;
+      --primary-hover: #e04812;
+      --primary-soft: #fff0eb;
+      --bg-page: #fbf9f6;
+      --bg-card: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border: 1px solid #f1e4d8;
+      border-radius: var(--radius-lg);
+      padding: 2.2rem 2rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .brand-icon {
+      font-size: 2.2rem;
+      background: var(--primary-soft);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .brand-header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .brand-header p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .role-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+      background: #f1f5f9;
+      padding: 0.3rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+    }
+
+    .role-tab {
+      background: transparent;
+      border: none;
+      padding: 0.55rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .role-tab.active {
+      background: #ffffff;
+      color: var(--text-dark);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.15s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    .demo-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1.5rem 0 1rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .demo-divider::before, .demo-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .demo-divider span {
+      padding: 0 0.75rem;
+    }
+
+    .demo-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .btn-demo {
+      width: 100%;
+      padding: 0.65rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .btn-demo:hover {
+      background: #f1f5f9;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 1.25rem;
+    }
+
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+
+    .back-home a:hover {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="brand-header">
+      <div class="brand-icon">🍔</div>
+      <h1>CloudBite Cafe</h1>
+      <p id="subheadingText">Customer Portal & Kitchen Login</p>
+    </div>
+
+    <!-- Role Tabs -->
+    <div class="role-tabs">
+      <button class="role-tab active" type="button" onclick="setRole('Customer', this)">👤 Customer</button>
+      <button class="role-tab" type="button" onclick="setRole('Manager', this)">👨‍🍳 Staff / Manager</button>
+    </div>
+
+    <!-- Login Form -->
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="emailInput" class="form-input" placeholder="e.g. arin@cloudbite.cafe" required />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="passwordInput" class="form-input" placeholder="••••••••" required />
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Sign In to CloudBite</button>
+    </form>
+
+    <!-- Teacher Presentation 1-Click Demo Buttons -->
+    <div class="demo-divider">
+      <span>1-Click Presentation Demo</span>
+    </div>
+
+    <div class="demo-buttons">
+      <button type="button" class="btn-demo" onclick="quickLogin('Arin Tholia', 'arin@cloudbite.cafe', 'Manager')">
+        ⚡ Demo Login as <strong>Arin Tholia (Manager)</strong>
+      </button>
+      <button type="button" class="btn-demo" onclick="quickLogin('Rahul Sharma', 'rahul@gmail.com', 'Customer')">
+        👤 Demo Login as <strong>Rahul Sharma (Customer)</strong>
+      </button>
+    </div>
+
+    <div class="back-home">
+      <a href="/">← Return to Cafe Menu</a>
+    </div>
+  </div>
+
+  <script>
+    let currentRole = 'Customer';
+
+    function setRole(role, btn) {
+      currentRole = role;
+      document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('subheadingText').textContent =
+        role === 'Manager' ? 'Restaurant Manager & Chef Portal' : 'Customer Portal & 1-Click Ordering';
+      document.getElementById('emailInput').placeholder =
+        role === 'Manager' ? 'manager@cloudbite.cafe' : 'customer@example.com';
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role: currentRole })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('cloudbite_user', JSON.stringify(data.user));
+          window.location.href = '/';
+        }
+      } catch (err) {
+        // Fallback for offline local dev
+        const name = email.split('@')[0] || 'User';
+        const user = { name: name.charAt(0).toUpperCase() + name.slice(1), email, role: currentRole };
+        localStorage.setItem('cloudbite_user', JSON.stringify(user));
+        window.location.href = '/';
+      }
+    }
+
+    function quickLogin(name, email, role) {
+      const user = { name, email, role };
+      localStorage.setItem('cloudbite_user', JSON.stringify(user));
+      window.location.href = '/';
+    }
+  </script>
+
+</body>
+</html>
