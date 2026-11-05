@@ -88,17 +88,39 @@ function initDataStore() {
       },
       {
         id: 'item-3',
+        name: 'Paneer Tikka Stuffed Crust Pizza',
+        category: 'Pizza & Burgers',
+        price: 329,
+        rating: '4.9',
+        prepTime: '16 mins',
+        emoji: '🍕',
+        badge: 'Must Try',
+        desc: 'Tandoori spiced paneer cubes, red paprika & gooey liquid cheese stuffed in the crust.'
+      },
+      {
+        id: 'item-4',
+        name: 'Smoky Double Patty Cheese Burger',
+        category: 'Pizza & Burgers',
+        price: 219,
+        rating: '4.8',
+        prepTime: '12 mins',
+        emoji: '🍔',
+        badge: 'Trending',
+        desc: 'Double grilled patties layered with molten cheddar, caramelized onions & BBQ sauce.'
+      },
+      {
+        id: 'item-5',
         name: 'Iced Caramel Cold Brew Latte',
         category: 'Coffee & Drinks',
         price: 149,
         rating: '4.9',
         prepTime: '5 mins',
         emoji: '🧋',
-        badge: 'Must Try',
+        badge: 'Bestseller',
         desc: '100% Arabica espresso blended with chilled milk and rich salted caramel.'
       },
       {
-        id: 'item-4',
+        id: 'item-6',
         name: 'Hot Hazelnut Cappuccino',
         category: 'Coffee & Drinks',
         price: 129,
@@ -109,7 +131,29 @@ function initDataStore() {
         desc: 'Velvety steamed milk foam poured over freshly roasted hazelnut espresso.'
       },
       {
-        id: 'item-5',
+        id: 'item-7',
+        name: 'Belgian Dark Chocolate Frappe',
+        category: 'Coffee & Drinks',
+        price: 169,
+        rating: '4.9',
+        prepTime: '6 mins',
+        emoji: '🥤',
+        badge: 'Top Rated',
+        desc: 'Thick blended cold coffee loaded with dark Belgian chocolate chips & whipped cream.'
+      },
+      {
+        id: 'item-8',
+        name: 'Fresh Mint Mojito Cooler',
+        category: 'Coffee & Drinks',
+        price: 119,
+        rating: '4.8',
+        prepTime: '4 mins',
+        emoji: '🍹',
+        badge: 'Refreshing',
+        desc: 'Crushed garden mint, fresh lime juice & sparkling soda over crushed ice.'
+      },
+      {
+        id: 'item-9',
         name: 'Belgian Chocolate Lava Cake',
         category: 'Desserts',
         price: 139,
@@ -120,7 +164,18 @@ function initDataStore() {
         desc: 'Warm dark chocolate cake with a gooey molten chocolate center & vanilla scoop.'
       },
       {
-        id: 'item-6',
+        id: 'item-10',
+        name: 'Classic New York Cheesecake',
+        category: 'Desserts',
+        price: 189,
+        rating: '4.9',
+        prepTime: '5 mins',
+        emoji: '🧀',
+        badge: 'Chef Special',
+        desc: 'Rich and velvety Philadelphia cream cheese on a buttery graham cracker crust.'
+      },
+      {
+        id: 'item-11',
         name: 'Loaded Cheesy Masala Fries',
         category: 'Snacks',
         price: 119,
@@ -129,6 +184,17 @@ function initDataStore() {
         emoji: '🍟',
         badge: 'Crispy',
         desc: 'Golden French fries drizzled with liquid jalapeno cheese and tangy spices.'
+      },
+      {
+        id: 'item-12',
+        name: 'Spiced Nachos with Jalapeno Cheese Dip',
+        category: 'Snacks',
+        price: 139,
+        rating: '4.8',
+        prepTime: '6 mins',
+        emoji: '🧀',
+        badge: 'Popular',
+        desc: 'Crispy corn tortilla chips served with warm melted cheese dip and Mexican salsa.'
       }
     ];
     writeJson(MENU_FILE, initialMenu);
