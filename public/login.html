@@ -227,6 +227,11 @@
       <p>Sign in to your account</p>
     </div>
 
+    <!-- Info Alert Box -->
+    <div class="alert" id="infoAlert" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;display:none;margin-bottom:1.25rem;padding:0.75rem 1rem;border-radius:var(--radius-sm);font-size:0.84rem;font-weight:600">
+      🔒 Please sign in or register to place your food order.
+    </div>
+
     <!-- Error Alert Box -->
     <div class="alert alert-danger" id="errorAlert"></div>
 
@@ -269,6 +274,11 @@
   </div>
 
   <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('msg') === 'order') {
+      document.getElementById('infoAlert').style.display = 'block';
+    }
+
     function fillCredentials(email, password) {
       document.getElementById('emailInput').value = email;
       document.getElementById('passwordInput').value = password;

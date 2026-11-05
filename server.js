@@ -355,6 +355,12 @@ app.post('/api/orders', (req, res) => {
     return res.status(400).json({ error: 'Item name is required' });
   }
 
+  // Strict Security: Orders strictly require an authenticated registered user
+  const cleanEmail = customerEmail ? customerEmail.trim().toLowerCase() : '';
+  if (!cleanEmail || cleanEmail === 'guest@cloudbite.cafe' || cleanEmail === 'walkin@cloudbite.cafe') {
+    return res.status(401).json({ error: 'Authentication required. Please sign in or register to place an order.' });
+  }
+
   const orders = readJson(ORDERS_FILE);
   const randomOrderNum = Math.floor(100 + Math.random() * 900);
   const payMethod = paymentMethod || 'UPI (Google Pay)';
@@ -365,8 +371,8 @@ app.post('/api/orders', (req, res) => {
     itemName,
     emoji: emoji || '🍔',
     price: Number(price) || 149,
-    customerName: customerName && customerName.trim() ? customerName.trim() : 'Guest Customer',
-    customerEmail: customerEmail && customerEmail.trim() ? customerEmail.trim().toLowerCase() : 'walkin@cloudbite.cafe',
+    customerName: customerName && customerName.trim() ? customerName.trim() : 'Verified Customer',
+    customerEmail: cleanEmail,
     deliveryAddress: deliveryAddress && deliveryAddress.trim() ? deliveryAddress.trim() : 'Campus Hostel Block B, Room 204',
     paymentMethod: payMethod,
     paymentStatus: isCod ? 'Pending (COD)' : 'Paid Online (Verified)',

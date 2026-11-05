@@ -1209,12 +1209,25 @@
           </div>
           <div class="food-bottom">
             <div class="food-price">₹${item.price}</div>
-            <button class="btn-order" onclick="openCheckoutModal('${item.name.replace(/'/g, "\\'")}', '${item.emoji}', ${item.price})">
-              🛒 Order Now
-            </button>
+            ${currentUser ? `
+              <button class="btn-order" onclick="openCheckoutModal('${item.name.replace(/'/g, "\\'")}', '${item.emoji}', ${item.price})">
+                🛒 Order Now
+              </button>
+            ` : `
+              <button class="btn-order" style="background:#475569" onclick="requireLoginToOrder('${item.name.replace(/'/g, "\\'")}')">
+                🔒 Sign In to Order
+              </button>
+            `}
           </div>
         </div>
       `).join('');
+    }
+
+    function requireLoginToOrder(itemName) {
+      showToast(`🔒 Please sign in or register to place your order!`);
+      setTimeout(() => {
+        window.location.href = '/login?msg=order';
+      }, 700);
     }
 
     function filterMenu(cat, btn) {
@@ -1233,6 +1246,11 @@
     let selectedPayment = 'UPI (Google Pay / PhonePe)';
 
     function openCheckoutModal(itemName, emoji, price) {
+      if (!currentUser) {
+        requireLoginToOrder(itemName);
+        return;
+      }
+
       activeOrderData = { itemName, emoji, price };
       selectedPayment = 'UPI (Google Pay / PhonePe)';
 
@@ -1277,9 +1295,14 @@
 
     async function confirmOrderPayment() {
       if (!activeOrderData) return;
+      if (!currentUser) {
+        showToast('🔒 Please sign in to place an order!');
+        window.location.href = '/login?msg=order';
+        return;
+      }
 
-      const customerName = currentUser ? currentUser.name : 'Guest Customer';
-      const customerEmail = currentUser ? currentUser.email : 'guest@cloudbite.cafe';
+      const customerName = currentUser.name;
+      const customerEmail = currentUser.email;
       const addressInput = document.getElementById('orderAddressInput');
       const deliveryAddress = (addressInput && addressInput.value.trim()) ? addressInput.value.trim() : 'Campus Hostel Block B, Room 204';
 

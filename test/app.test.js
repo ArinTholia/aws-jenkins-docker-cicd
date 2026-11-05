@@ -37,7 +37,8 @@ test('GET /api/menu returns cafe menu items', async () => {
   assert.ok(menu.length > 0);
 });
 
-test('POST and DELETE /api/orders places and removes a 1-click food order', async () => {
+test('POST and DELETE /api/orders places and removes an authenticated food order', async () => {
+  // 1. Authorized order with authenticated customer email
   const createRes = await fetch(`${baseUrl}/api/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -45,13 +46,29 @@ test('POST and DELETE /api/orders places and removes a 1-click food order', asyn
       itemName: 'Test Cheese Pizza',
       emoji: '🍕',
       price: 299,
-      customerName: 'Jenkins Automated Test'
+      customerName: 'Rahul Sharma',
+      customerEmail: 'customer@gmail.com',
+      deliveryAddress: 'Hostel Block B, Room 204',
+      paymentMethod: 'UPI (Google Pay / PhonePe)'
     })
   });
   assert.strictEqual(createRes.status, 201);
   const order = await createRes.json();
   assert.strictEqual(order.itemName, 'Test Cheese Pizza');
+  assert.strictEqual(order.customerEmail, 'customer@gmail.com');
 
+  // 2. Unauthenticated order attempt without email is rejected with 401
+  const unauthRes = await fetch(`${baseUrl}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      itemName: 'Hacker Pizza',
+      price: 299
+    })
+  });
+  assert.strictEqual(unauthRes.status, 401);
+
+  // 3. Clean up created order
   const delRes = await fetch(`${baseUrl}/api/orders/${order.id}`, {
     method: 'DELETE'
   });
