@@ -578,6 +578,261 @@
       border-left: 4px solid var(--primary);
     }
 
+    /* Checkout & Payment Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      animation: modalPop 0.22s ease-out;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-head {
+      background: linear-gradient(135deg, #ff5a1f 0%, #ff7e39 100%);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-head h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.22);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .modal-body {
+      padding: 1.4rem 1.5rem 1rem;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .checkout-item-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.2rem;
+    }
+
+    .checkout-item-emoji {
+      font-size: 2.2rem;
+    }
+
+    .checkout-item-info {
+      flex: 1;
+    }
+
+    .checkout-item-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .checkout-item-price {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 1.15rem;
+    }
+
+    .checkout-field {
+      margin-bottom: 1.2rem;
+    }
+
+    .checkout-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.45rem;
+    }
+
+    .checkout-input {
+      width: 100%;
+      padding: 0.75rem 0.95rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .checkout-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.15);
+    }
+
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .pay-option {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .pay-option:hover {
+      border-color: #cbd5e1;
+      background: #faf8f5;
+    }
+
+    .pay-option.selected {
+      border-color: var(--primary);
+      background: #fff7ed;
+    }
+
+    .pay-option input[type="radio"] {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+
+    .pay-option-title {
+      font-weight: 750;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+
+    .pay-option-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .bill-summary {
+      background: #faf8f5;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .bill-row.total {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      border-top: 1px dashed var(--border);
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
+
+    .modal-foot {
+      padding: 0.85rem 1.5rem 1.5rem;
+      display: flex;
+      gap: 0.85rem;
+    }
+
+    .btn-confirm-order {
+      flex: 1;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 90, 31, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-confirm-order:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-confirm-order:active {
+      transform: scale(0.98);
+    }
+
+    .btn-cancel-order {
+      background: #f1f5f9;
+      color: var(--text-dark);
+      border: none;
+      padding: 0.9rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .btn-cancel-order:hover {
+      background: #e2e8f0;
+    }
+
     /* Footer */
     .site-footer {
       background: #0f172a;
@@ -735,6 +990,91 @@
 
   <div class="toast" id="toastBox">Notification</div>
 
+  <!-- Express Checkout & Payment Modal -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>🛍️ Express Checkout & Delivery</h3>
+        <button class="modal-close-btn" onclick="closeCheckoutModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Dish Preview -->
+        <div class="checkout-item-preview">
+          <div class="checkout-item-emoji" id="modalItemEmoji">🍕</div>
+          <div class="checkout-item-info">
+            <div class="checkout-item-title" id="modalItemName">Farmhouse Cheese Burst Pizza</div>
+            <div class="checkout-item-price" id="modalItemPrice">₹299</div>
+          </div>
+        </div>
+
+        <!-- Delivery Address Input -->
+        <div class="checkout-field">
+          <label for="orderAddressInput">📍 Delivery Address / Table Number</label>
+          <input type="text" id="orderAddressInput" class="checkout-input" value="Campus Hostel Block B, Room 204" placeholder="Enter delivery room, hostel, or flat address" />
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="checkout-field">
+          <label>💳 Payment Method</label>
+          <div class="payment-options">
+            <label class="pay-option selected" id="payOptUPI" onclick="selectPaymentMethod('UPI (Google Pay / PhonePe)', this)">
+              <input type="radio" name="paymentOptionRadio" checked />
+              <div>
+                <div class="pay-option-title">⚡ Instant UPI (Google Pay / PhonePe / Paytm)</div>
+                <div class="pay-option-sub">Direct digital confirmation • Fast kitchen dispatch</div>
+              </div>
+            </label>
+
+            <label class="pay-option" id="payOptCOD" onclick="selectPaymentMethod('Cash on Delivery', this)">
+              <input type="radio" name="paymentOptionRadio" />
+              <div>
+                <div class="pay-option-title">💵 Cash on Delivery (COD)</div>
+                <div class="pay-option-sub">Pay cash to delivery rider upon arrival</div>
+              </div>
+            </label>
+
+            <label class="pay-option" id="payOptCard" onclick="selectPaymentMethod('Debit / Credit Card', this)">
+              <input type="radio" name="paymentOptionRadio" />
+              <div>
+                <div class="pay-option-title">💳 Debit / Credit Card</div>
+                <div class="pay-option-sub">Visa, Mastercard, RuPay accepted</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bill Breakdown -->
+        <div class="bill-summary">
+          <div class="bill-row">
+            <span>Item Subtotal</span>
+            <span id="modalSubtotal">₹299</span>
+          </div>
+          <div class="bill-row">
+            <span>Delivery Fee</span>
+            <span style="color:var(--green);font-weight:700">FREE (Campus Special)</span>
+          </div>
+          <div class="bill-row">
+            <span>Taxes & Kitchen Packaging</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="bill-row total">
+            <span>Total Payable Amount</span>
+            <span id="modalTotalAmount">₹299</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-cancel-order" onclick="closeCheckoutModal()">Cancel</button>
+        <button class="btn-confirm-order" id="btnConfirmPay" onclick="confirmOrderPayment()">
+          <span>🚀 Confirm & Place Order</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-inner">
@@ -869,8 +1209,8 @@
           </div>
           <div class="food-bottom">
             <div class="food-price">₹${item.price}</div>
-            <button class="btn-order" onclick="placeOneClickOrder('${item.name.replace(/'/g, "\\'")}', '${item.emoji}', ${item.price})">
-              🛒 1-Click Order
+            <button class="btn-order" onclick="openCheckoutModal('${item.name.replace(/'/g, "\\'")}', '${item.emoji}', ${item.price})">
+              🛒 Order Now
             </button>
           </div>
         </div>
@@ -889,18 +1229,95 @@
       renderMenu();
     }
 
-    async function placeOneClickOrder(itemName, emoji, price) {
+    let activeOrderData = null;
+    let selectedPayment = 'UPI (Google Pay / PhonePe)';
+
+    function openCheckoutModal(itemName, emoji, price) {
+      activeOrderData = { itemName, emoji, price };
+      selectedPayment = 'UPI (Google Pay / PhonePe)';
+
+      document.getElementById('modalItemEmoji').textContent = emoji;
+      document.getElementById('modalItemName').textContent = itemName;
+      document.getElementById('modalItemPrice').textContent = `₹${price}`;
+      document.getElementById('modalSubtotal').textContent = `₹${price}`;
+      document.getElementById('modalTotalAmount').textContent = `₹${price}`;
+      document.getElementById('btnConfirmPay').innerHTML = `<span>🚀 Confirm & Pay ₹${price}</span>`;
+
+      // Reset payment option styles
+      document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('selected'));
+      const upiOpt = document.getElementById('payOptUPI');
+      if (upiOpt) {
+        upiOpt.classList.add('selected');
+        upiOpt.querySelector('input').checked = true;
+      }
+
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.remove('open');
+      activeOrderData = null;
+    }
+
+    function selectPaymentMethod(methodName, element) {
+      selectedPayment = methodName;
+      document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      const radio = element.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      const isCod = methodName.toLowerCase().includes('cash');
+      const btn = document.getElementById('btnConfirmPay');
+      if (isCod) {
+        btn.innerHTML = `<span>🛵 Place Order (Pay ₹${activeOrderData.price} on Delivery)</span>`;
+      } else {
+        btn.innerHTML = `<span>🚀 Confirm & Pay ₹${activeOrderData.price}</span>`;
+      }
+    }
+
+    async function confirmOrderPayment() {
+      if (!activeOrderData) return;
+
       const customerName = currentUser ? currentUser.name : 'Guest Customer';
       const customerEmail = currentUser ? currentUser.email : 'guest@cloudbite.cafe';
+      const addressInput = document.getElementById('orderAddressInput');
+      const deliveryAddress = (addressInput && addressInput.value.trim()) ? addressInput.value.trim() : 'Campus Hostel Block B, Room 204';
 
-      await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemName, emoji, price, customerName, customerEmail })
-      });
+      const btn = document.getElementById('btnConfirmPay');
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Processing Payment...</span>`;
 
-      showToast(`🎉 Order Placed: ${emoji} ${itemName}! Sent to kitchen.`);
-      await loadCustomerOrders();
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemName: activeOrderData.itemName,
+            emoji: activeOrderData.emoji,
+            price: activeOrderData.price,
+            customerName,
+            customerEmail,
+            deliveryAddress,
+            paymentMethod: selectedPayment
+          })
+        });
+
+        const newOrder = await res.json();
+        closeCheckoutModal();
+
+        const isCod = selectedPayment.toLowerCase().includes('cash');
+        if (isCod) {
+          showToast(`🛵 Order Placed (COD)! Deliver to: ${deliveryAddress}`);
+        } else {
+          showToast(`🎉 Payment Verified via ${selectedPayment}! Order sent to kitchen.`);
+        }
+
+        await loadCustomerOrders();
+      } catch (err) {
+        showToast('❌ Error placing order. Please try again.');
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     async function loadCustomerOrders() {
@@ -919,7 +1336,7 @@
           <div class="empty-orders">
             <div style="font-size:2.5rem;margin-bottom:0.5rem">🛒</div>
             <strong>No active orders yet.</strong>
-            <p>Click "1-Click Order" on any dish to place an order and track its live delivery status here!</p>
+            <p>Select any dish to place an order and track its live delivery status here!</p>
           </div>
         `;
         return;
@@ -927,14 +1344,20 @@
 
       list.innerHTML = orders.map(o => {
         const badgeClass = 'badge-' + (o.status ? o.status.replace(/\s+/g, '') : 'Preparing');
+        const isPaid = o.paymentStatus && o.paymentStatus.includes('Paid');
         return `
           <div class="my-order-item">
             <div class="my-order-row1">
               <span class="my-order-title">${o.emoji || '🍽️'} ${escapeHtml(o.itemName)}</span>
               <span class="my-order-price">₹${o.price}</span>
             </div>
+            <div style="font-size:0.78rem;color:#64748b;margin:0.25rem 0;display:flex;align-items:center;gap:0.35rem">
+              <span>📍</span> <span>${escapeHtml(o.deliveryAddress || 'Campus Hostel Block B, Room 204')}</span>
+            </div>
             <div class="my-order-row2">
-              <span>⏱ Ordered: ${escapeHtml(o.orderedAt)}</span>
+              <span style="font-size:0.75rem;font-weight:700;color:${isPaid ? '#16a34a' : '#d97706'}">
+                💳 ${escapeHtml(o.paymentMethod || 'UPI')} • ${escapeHtml(o.paymentStatus || 'Paid Online')}
+              </span>
               <span class="status-badge ${badgeClass}">${escapeHtml(o.status)}</span>
             </div>
           </div>

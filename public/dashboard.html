@@ -637,6 +637,15 @@
               <span>⏱ ${escapeHtml(o.orderedAt)}</span>
               <span class="status-badge ${badgeClass}">${escapeHtml(o.status)}</span>
             </div>
+            <div style="font-size:0.83rem;color:var(--text-muted);margin:0.5rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem">
+              <span>📍</span> <strong>Delivery:</strong> <span>${escapeHtml(o.deliveryAddress || 'Campus Hostel Block B, Room 204')}</span>
+            </div>
+            <div style="font-size:0.83rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem">
+              <span>💳</span> <strong>Payment:</strong> 
+              <span style="display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.75rem;background:${(o.paymentStatus && o.paymentStatus.includes('Paid')) ? 'rgba(34,197,94,0.18)' : 'rgba(245,158,11,0.18)'};color:${(o.paymentStatus && o.paymentStatus.includes('Paid')) ? '#4ade80' : '#fbbf24'}">
+                ${escapeHtml(o.paymentMethod || 'UPI')} • ${escapeHtml(o.paymentStatus || 'Paid Online')}
+              </span>
+            </div>
             <div class="ticket-actions">
               <button class="btn-action btn-prep" onclick="updateOrderStatus('${o.id}', 'Preparing')">🍳 Preparing</button>
               <button class="btn-action btn-dispatch" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">🛵 Dispatch</button>

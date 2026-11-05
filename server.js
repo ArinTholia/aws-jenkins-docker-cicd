@@ -350,13 +350,16 @@ app.get('/api/orders', (req, res) => {
 });
 
 app.post('/api/orders', (req, res) => {
-  const { itemName, emoji, price, customerName, customerEmail } = req.body;
+  const { itemName, emoji, price, customerName, customerEmail, deliveryAddress, paymentMethod } = req.body;
   if (!itemName) {
     return res.status(400).json({ error: 'Item name is required' });
   }
 
   const orders = readJson(ORDERS_FILE);
   const randomOrderNum = Math.floor(100 + Math.random() * 900);
+  const payMethod = paymentMethod || 'UPI (Google Pay)';
+  const isCod = payMethod.toLowerCase().includes('cash');
+
   const newOrder = {
     id: `ORD-${randomOrderNum}`,
     itemName,
@@ -364,6 +367,9 @@ app.post('/api/orders', (req, res) => {
     price: Number(price) || 149,
     customerName: customerName && customerName.trim() ? customerName.trim() : 'Guest Customer',
     customerEmail: customerEmail && customerEmail.trim() ? customerEmail.trim().toLowerCase() : 'walkin@cloudbite.cafe',
+    deliveryAddress: deliveryAddress && deliveryAddress.trim() ? deliveryAddress.trim() : 'Campus Hostel Block B, Room 204',
+    paymentMethod: payMethod,
+    paymentStatus: isCod ? 'Pending (COD)' : 'Paid Online (Verified)',
     status: 'Preparing',
     orderedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   };
