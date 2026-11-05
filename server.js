@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
 
 const app = express();
@@ -13,14 +14,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 const DATA_DIR = path.join(__dirname, 'data');
 const MENU_FILE = path.join(DATA_DIR, 'menu.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
-// Initialize Default Cafe Menu & Sample Orders
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(String(password).trim()).digest('hex');
+}
+
+function readJson(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (e) {
+    return [];
+  }
+}
+
+function writeJson(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+// Initialize Default Store Data
 function initDataStore() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  if (!fs.existsSync(MENU_FILE)) {
+  // Pre-configured Verified Users
+  if (!fs.existsSync(USERS_FILE) || readJson(USERS_FILE).length === 0) {
+    const initialUsers = [
+      {
+        id: 'usr-1',
+        name: 'Arin Tholia',
+        email: 'manager@cloudbite.cafe',
+        passwordHash: hashPassword('manager123'),
+        role: 'Manager',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'usr-2',
+        name: 'Rahul Sharma',
+        email: 'customer@gmail.com',
+        passwordHash: hashPassword('customer123'),
+        role: 'Customer',
+        createdAt: new Date().toISOString()
+      }
+    ];
+    writeJson(USERS_FILE, initialUsers);
+  }
+
+  // Initial Food Menu
+  if (!fs.existsSync(MENU_FILE) || readJson(MENU_FILE).length === 0) {
     const initialMenu = [
       {
         id: 'item-1',
@@ -89,42 +131,52 @@ function initDataStore() {
         desc: 'Golden French fries drizzled with liquid jalapeno cheese and tangy spices.'
       }
     ];
-    fs.writeFileSync(MENU_FILE, JSON.stringify(initialMenu, null, 2));
+    writeJson(MENU_FILE, initialMenu);
   }
 
-  if (!fs.existsSync(ORDERS_FILE)) {
+  // Initial Kitchen Orders
+  if (!fs.existsSync(ORDERS_FILE) || readJson(ORDERS_FILE).length === 0) {
     const initialOrders = [
       {
         id: 'ORD-101',
         itemName: 'Farmhouse Cheese Burst Pizza',
         emoji: '🍕',
         price: 299,
-        customerName: 'Rahul (Table #4)',
+        customerName: 'Rahul Sharma',
+        customerEmail: 'customer@gmail.com',
         status: 'Preparing',
-        orderedAt: 'Just now'
+        orderedAt: '10 mins ago'
       },
       {
         id: 'ORD-102',
         itemName: 'Iced Caramel Cold Brew Latte',
         emoji: '🧋',
         price: 149,
-        customerName: 'Priya (Online Order)',
+        customerName: 'Priya Verma',
+        customerEmail: 'priya@gmail.com',
         status: 'Out for Delivery',
-        orderedAt: '5 mins ago'
+        orderedAt: '15 mins ago'
       }
     ];
-    fs.writeFileSync(ORDERS_FILE, JSON.stringify(initialOrders, null, 2));
+    writeJson(ORDERS_FILE, initialOrders);
   }
 }
 
 initDataStore();
 
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function writeJson(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+function getGitInfo() {
+  try {
+    const log = execSync('git log -n 5 --oneline', { cwd: __dirname }).toString().trim();
+    const branch = execSync('git branch --show-current', { cwd: __dirname }).toString().trim();
+    const commit = execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim();
+    return { log, branch: branch || 'main', commit };
+  } catch (e) {
+    return {
+      log: 'fcab7f8 CloudBite Cafe Full-Stack Web Application',
+      branch: process.env.GIT_BRANCH || 'main',
+      commit: (process.env.GIT_COMMIT || 'fcab7f8').substring(0, 7)
+    };
+  }
 }
 
 function safeReadText(fileName) {
@@ -135,45 +187,213 @@ function safeReadText(fileName) {
   }
 }
 
-function getGitInfo() {
-  try {
-    const log = execSync('git log -n 5 --oneline', { cwd: __dirname }).toString().trim();
-    const branch = execSync('git branch --show-current', { cwd: __dirname }).toString().trim();
-    const commit = execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim();
-    return { log, branch: branch || 'main', commit };
-  } catch (e) {
-    return {
-      log: '445535f Update website to CloudBite Cafe 1-Click Food Ordering App\nc7485ba Initial commit: Automated CI/CD Pipeline',
-      branch: process.env.GIT_BRANCH || 'main',
-      commit: (process.env.GIT_COMMIT || '445535f').substring(0, 7)
-    };
-  }
-}
+// ============================================================================
+// 1. PAGE ROUTES (HTML Views)
+// ============================================================================
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-// ============================================================================
-// 1. HEALTH CHECK & DEVOPS PROOF API (For Jenkins, Docker & Teacher Demo)
-// ============================================================================
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.post('/api/auth/login', (req, res) => {
-  const { email, role } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// ============================================================================
+// 2. AUTHENTICATION & USER MANAGEMENT APIS (Real DB Validation)
+// ============================================================================
+app.post('/api/auth/register', (req, res) => {
+  const { name, email, password, role } = req.body;
+  if (!name || !name.trim() || !email || !email.trim() || !password) {
+    return res.status(400).json({ error: 'All fields (name, email, password) are required' });
   }
-  const namePart = email.split('@')[0] || 'User';
-  const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-  res.json({
+
+  const cleanEmail = email.trim().toLowerCase();
+  const users = readJson(USERS_FILE);
+
+  // Check duplicate email
+  const existing = users.find(u => u.email.toLowerCase() === cleanEmail);
+  if (existing) {
+    return res.status(409).json({ error: 'An account with this email already exists. Please login instead.' });
+  }
+
+  if (password.length < 4) {
+    return res.status(400).json({ error: 'Password must be at least 4 characters long' });
+  }
+
+  const newUser = {
+    id: `usr-${Date.now()}`,
+    name: name.trim(),
+    email: cleanEmail,
+    passwordHash: hashPassword(password),
+    role: role === 'Manager' ? 'Manager' : 'Customer',
+    createdAt: new Date().toISOString()
+  };
+
+  users.push(newUser);
+  writeJson(USERS_FILE, users);
+
+  res.status(201).json({
     success: true,
+    message: 'Registration successful',
     user: {
-      name: formattedName,
-      email,
-      role: role || (email.toLowerCase().includes('admin') || email.toLowerCase().includes('manager') ? 'Manager' : 'Customer')
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role
     }
   });
 });
 
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Please provide both email and password' });
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const users = readJson(USERS_FILE);
+  const user = users.find(u => u.email.toLowerCase() === cleanEmail);
+
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password. User not found.' });
+  }
+
+  const incomingHash = hashPassword(password);
+  if (user.passwordHash !== incomingHash) {
+    return res.status(401).json({ error: 'Invalid email or password. Incorrect password.' });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }
+  });
+});
+
+// ============================================================================
+// 3. CAFE MENU APIS (CRUD)
+// ============================================================================
+app.get('/api/menu', (req, res) => {
+  const menu = readJson(MENU_FILE);
+  res.json(menu);
+});
+
+app.post('/api/menu', (req, res) => {
+  const { name, category, price, emoji, desc } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Dish name is required' });
+  }
+
+  const menu = readJson(MENU_FILE);
+  const newDish = {
+    id: `item-${Date.now()}`,
+    name: name.trim(),
+    category: category || 'Pizza & Burgers',
+    price: Number(price) || 149,
+    rating: '4.9',
+    prepTime: '12 mins',
+    emoji: emoji || '🍽️',
+    badge: 'Special',
+    desc: desc && desc.trim() ? desc.trim() : 'Freshly prepared signature dish added to our live menu.'
+  };
+
+  menu.unshift(newDish);
+  writeJson(MENU_FILE, menu);
+  res.status(201).json(newDish);
+});
+
+app.delete('/api/menu/:id', (req, res) => {
+  const menu = readJson(MENU_FILE);
+  const filtered = menu.filter(item => item.id !== req.params.id);
+  writeJson(MENU_FILE, filtered);
+  res.json({ deleted: true });
+});
+
+// ============================================================================
+// 4. ORDERS & KITCHEN APIS (CRUD + Role Specific Filtering)
+// ============================================================================
+app.get('/api/orders', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const userEmail = req.query.email ? req.query.email.toLowerCase() : null;
+
+  // If customer email provided, return customer's order history
+  if (userEmail) {
+    const customerOrders = orders.filter(o => o.customerEmail && o.customerEmail.toLowerCase() === userEmail);
+    return res.json({ orders: customerOrders, total: customerOrders.length });
+  }
+
+  // Manager Kitchen View: return all orders + business analytics
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0), 0);
+  res.json({
+    orders,
+    stats: {
+      totalOrders: orders.length,
+      preparing: orders.filter(o => o.status === 'Preparing').length,
+      outForDelivery: orders.filter(o => o.status === 'Out for Delivery').length,
+      delivered: orders.filter(o => o.status === 'Delivered').length,
+      totalRevenue
+    }
+  });
+});
+
+app.post('/api/orders', (req, res) => {
+  const { itemName, emoji, price, customerName, customerEmail } = req.body;
+  if (!itemName) {
+    return res.status(400).json({ error: 'Item name is required' });
+  }
+
+  const orders = readJson(ORDERS_FILE);
+  const randomOrderNum = Math.floor(100 + Math.random() * 900);
+  const newOrder = {
+    id: `ORD-${randomOrderNum}`,
+    itemName,
+    emoji: emoji || '🍔',
+    price: Number(price) || 149,
+    customerName: customerName && customerName.trim() ? customerName.trim() : 'Guest Customer',
+    customerEmail: customerEmail && customerEmail.trim() ? customerEmail.trim().toLowerCase() : 'walkin@cloudbite.cafe',
+    status: 'Preparing',
+    orderedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+
+  orders.unshift(newOrder);
+  writeJson(ORDERS_FILE, orders);
+  res.status(201).json(newOrder);
+});
+
+app.patch('/api/orders/:id', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const idx = orders.findIndex(o => o.id === req.params.id);
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+  orders[idx].status = req.body.status || 'Delivered';
+  writeJson(ORDERS_FILE, orders);
+  res.json(orders[idx]);
+});
+
+app.delete('/api/orders/:id', (req, res) => {
+  const orders = readJson(ORDERS_FILE);
+  const filtered = orders.filter(o => o.id !== req.params.id);
+  writeJson(ORDERS_FILE, filtered);
+  res.json({ deleted: true });
+});
+
+// ============================================================================
+// 5. DEVOPS HEALTH & TELEMETRY APIS
+// ============================================================================
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',
@@ -222,107 +442,14 @@ app.get('/api/devops-proof', (req, res) => {
   });
 });
 
-// ============================================================================
-// 2. CAFE MENU API (Browse & Add New Dishes Dynamically)
-// ============================================================================
-app.get('/api/menu', (req, res) => {
-  const menu = readJson(MENU_FILE);
-  res.json(menu);
-});
-
-app.post('/api/menu', (req, res) => {
-  const { name, category, price, emoji, desc } = req.body;
-  if (!name || !name.trim()) {
-    return res.status(400).json({ error: 'Dish name is required' });
-  }
-
-  const menu = readJson(MENU_FILE);
-  const newDish = {
-    id: `item-${Date.now()}`,
-    name: name.trim(),
-    category: category || 'Pizza & Burgers',
-    price: Number(price) || 149,
-    rating: '4.9',
-    prepTime: '12 mins',
-    emoji: emoji || '🍽️',
-    badge: 'New Arrival',
-    desc: desc && desc.trim() ? desc.trim() : 'Freshly prepared signature dish added to our live menu.'
-  };
-
-  menu.unshift(newDish);
-  writeJson(MENU_FILE, menu);
-  res.status(201).json(newDish);
-});
-
-app.delete('/api/menu/:id', (req, res) => {
-  const menu = readJson(MENU_FILE);
-  const filtered = menu.filter(item => item.id !== req.params.id);
-  writeJson(MENU_FILE, filtered);
-  res.json({ deleted: true });
-});
-
-// ============================================================================
-// 3. 1-CLICK LIVE ORDERS API (Place Order, Update Status, Cancel)
-// ============================================================================
-app.get('/api/orders', (req, res) => {
-  const orders = readJson(ORDERS_FILE);
-  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0), 0);
-  res.json({
-    orders,
-    stats: {
-      totalOrders: orders.length,
-      preparing: orders.filter(o => o.status === 'Preparing').length,
-      delivered: orders.filter(o => o.status === 'Delivered').length,
-      totalRevenue
-    }
-  });
-});
-
-app.post('/api/orders', (req, res) => {
-  const { itemName, emoji, price, customerName } = req.body;
-  if (!itemName) {
-    return res.status(400).json({ error: 'Item name is required' });
-  }
-
-  const orders = readJson(ORDERS_FILE);
-  const randomOrderNum = Math.floor(100 + Math.random() * 900);
-  const newOrder = {
-    id: `ORD-${randomOrderNum}`,
-    itemName,
-    emoji: emoji || '🍔',
-    price: Number(price) || 149,
-    customerName: customerName && customerName.trim() ? customerName.trim() : 'Walk-in Customer',
-    status: 'Preparing',
-    orderedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  };
-
-  orders.unshift(newOrder);
-  writeJson(ORDERS_FILE, orders);
-  res.status(201).json(newOrder);
-});
-
-app.patch('/api/orders/:id', (req, res) => {
-  const orders = readJson(ORDERS_FILE);
-  const idx = orders.findIndex(o => o.id === req.params.id);
-  if (idx === -1) {
-    return res.status(404).json({ error: 'Order not found' });
-  }
-  orders[idx].status = req.body.status || 'Delivered';
-  writeJson(ORDERS_FILE, orders);
-  res.json(orders[idx]);
-});
-
-app.delete('/api/orders/:id', (req, res) => {
-  const orders = readJson(ORDERS_FILE);
-  const filtered = orders.filter(o => o.id !== req.params.id);
-  writeJson(ORDERS_FILE, filtered);
-  res.json({ deleted: true });
-});
-
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`========================================================`);
-    console.log(`🍔 CloudBite Cafe Website running on http://localhost:${PORT}`);
+    console.log(`🍔 CloudBite Cafe Server running on http://localhost:${PORT}`);
+    console.log(`👤 Customer Portal : http://localhost:${PORT}/`);
+    console.log(`🔐 Login Page      : http://localhost:${PORT}/login`);
+    console.log(`📝 Register Page   : http://localhost:${PORT}/register`);
+    console.log(`👨‍🍳 Kitchen Dash    : http://localhost:${PORT}/dashboard`);
     console.log(`========================================================`);
   });
 }

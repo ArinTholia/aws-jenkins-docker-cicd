@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Dashboard — CloudBite Cafe</title>
+  <style>
+    :root {
+      --primary: #ff5a1f;
+      --primary-hover: #e04812;
+      --bg-page: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-alt: #182234;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --blue: #38bdf8;
+      --blue-soft: rgba(56, 189, 248, 0.15);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      background: #182234;
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      font-size: 1.8rem;
+      background: rgba(255, 90, 31, 0.15);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .brand-title span {
+      font-size: 0.72rem;
+      background: var(--amber-soft);
+      color: var(--amber);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .btn-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+
+    .btn-link:hover {
+      color: var(--primary);
+    }
+
+    .btn-logout {
+      background: var(--danger-soft);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      flex: 1;
+    }
+
+    /* Access Denied Card */
+    .access-denied {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--danger);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      text-align: center;
+      max-width: 540px;
+      margin: 4rem auto;
+    }
+
+    .access-denied h2 {
+      font-size: 1.6rem;
+      color: #f87171;
+      margin-bottom: 0.75rem;
+    }
+
+    .access-denied p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    /* KPI Stats Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .stat-card.rev::before { background: var(--green); }
+    .stat-card.prep::before { background: var(--amber); }
+    .stat-card.deliv::before { background: var(--blue); }
+    .stat-card.tot::before { background: var(--primary); }
+
+    .stat-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    /* Main Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    /* Kitchen Tickets */
+    .orders-queue {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .order-ticket {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .order-ticket:hover {
+      border-color: #475569;
+    }
+
+    .ticket-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ticket-id {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #38bdf8;
+      font-family: monospace;
+    }
+
+    .ticket-price {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: #ffffff;
+    }
+
+    .ticket-item {
+      font-size: 1.02rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ticket-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .status-badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .badge-Preparing { background: var(--amber-soft); color: #fbbf24; }
+    .badge-OutforDelivery { background: var(--blue-soft); color: #38bdf8; }
+    .badge-Delivered { background: var(--green-soft); color: #4ade80; }
+
+    .ticket-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    .btn-action {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.45rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-action:hover {
+      background: #1e293b;
+      border-color: #64748b;
+    }
+
+    .btn-prep { color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
+    .btn-dispatch { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+    .btn-delivered { color: #4ade80; border-color: rgba(34, 197, 94, 0.4); }
+    .btn-delete { color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+
+    /* Menu Management */
+    .menu-mgmt-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 1.25rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .menu-mgmt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.85rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #ffffff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #22c55e;
+      color: white;
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-icon">👨‍🍳</div>
+      <div class="brand-title">
+        <h1>CloudBite Operations</h1>
+        <span>Kitchen Staff & Manager</span>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="/" class="btn-link">🍽️ View Cafe Storefront</a>
+      <div class="user-pill" id="managerPill">
+        <span>👤 Arin Tholia</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Access Denied Banner (Shown if customer tries to open this page) -->
+  <div class="access-denied" id="accessDeniedCard">
+    <h2>🔒 Access Denied: Manager Privileges Required</h2>
+    <p>You are currently signed in as a <strong>Customer</strong>. Only Restaurant Staff and Managers have permission to view live order tickets and edit the menu catalog.</p>
+    <div style="display:flex;justify-content:center;gap:1rem">
+      <a href="/" style="background:#334155;color:#fff;padding:0.7rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:700">← Return to Customer Store</a>
+      <a href="/login" style="background:var(--primary);color:#fff;padding:0.7rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:700">Login as Manager</a>
+    </div>
+  </div>
+
+  <!-- Main Management Dashboard -->
+  <div class="container" id="dashboardContent">
+
+    <!-- KPI Metric Cards -->
+    <div class="stats-grid">
+      <div class="stat-card rev">
+        <div class="stat-title">Total Sales Revenue</div>
+        <div class="stat-num" id="statRevenue">₹0</div>
+      </div>
+      <div class="stat-card prep">
+        <div class="stat-title">In Kitchen (Cooking)</div>
+        <div class="stat-num" id="statPreparing">0</div>
+      </div>
+      <div class="stat-card deliv">
+        <div class="stat-title">Out for Delivery</div>
+        <div class="stat-num" id="statOutForDelivery">0</div>
+      </div>
+      <div class="stat-card tot">
+        <div class="stat-title">Total Lifetime Orders</div>
+        <div class="stat-num" id="statTotalOrders">0</div>
+      </div>
+    </div>
+
+    <!-- 2-Column Workflow -->
+    <div class="dashboard-grid">
+
+      <!-- Column 1: Live Kitchen Order Tickets -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>📋 Live Kitchen Order Tickets</h3>
+          <span style="font-size:0.75rem;color:var(--green);font-weight:700">● Live Auto-Sync</span>
+        </div>
+
+        <div class="orders-queue" id="ordersQueue">
+          <div style="text-align:center;padding:2rem;color:var(--text-muted)">Loading order queue...</div>
+        </div>
+      </div>
+
+      <!-- Column 2: Restaurant Menu Management -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>🍽️ Menu Catalog Management</h3>
+          <span style="font-size:0.75rem;color:var(--text-muted)">Add & Remove Dishes</span>
+        </div>
+
+        <!-- Add Dish Form -->
+        <form onsubmit="addNewDish(event)">
+          <div class="form-group">
+            <label>Dish Name *</label>
+            <input type="text" id="dishName" class="form-input" placeholder="e.g. Garlic Mushroom Pizza" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Price (₹) *</label>
+              <input type="number" id="dishPrice" class="form-input" value="199" required />
+            </div>
+            <div class="form-group">
+              <label>Food Emoji Icon</label>
+              <select id="dishEmoji" class="form-input">
+                <option value="🍕">🍕 Pizza</option>
+                <option value="🍔">🍔 Burger</option>
+                <option value="☕">☕ Coffee</option>
+                <option value="🧋">🧋 Cold Drink</option>
+                <option value="🍰">🍰 Dessert</option>
+                <option value="🍟">🍟 Snack / Fries</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="dishCategory" class="form-input">
+              <option value="Pizza & Burgers">Pizza & Burgers</option>
+              <option value="Coffee & Drinks">Coffee & Drinks</option>
+              <option value="Desserts">Desserts</option>
+              <option value="Snacks">Snacks</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">+ Add Dish to Live Store</button>
+        </form>
+
+        <div class="panel-header" style="margin-top:1.5rem">
+          <h3>Active Dishes</h3>
+          <span id="activeDishesCount" style="font-size:0.75rem;color:var(--text-muted)">0 items</span>
+        </div>
+        <div class="menu-mgmt-list" id="menuMgmtList"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="toast" id="toastBox">Notification</div>
+
+  <script>
+    let currentUser = null;
+
+    function showToast(msg) {
+      const t = document.getElementById('toastBox');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2400);
+    }
+
+    function checkAuth() {
+      const userStr = localStorage.getItem('cloudbite_user');
+      if (!userStr) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        currentUser = JSON.parse(userStr);
+        if (currentUser.role !== 'Manager') {
+          // Deny access to customers!
+          document.getElementById('dashboardContent').style.display = 'none';
+          document.getElementById('accessDeniedCard').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('managerPill').innerHTML = `<span>👨‍🍳 ${escapeHtml(currentUser.name)} (Manager)</span>`;
+        loadDashboardData();
+        setInterval(loadOrders, 4000); // Live poll kitchen tickets every 4s
+      } catch (e) {
+        window.location.href = '/login';
+      }
+    }
+
+    async function loadDashboardData() {
+      await loadOrders();
+      await loadMenuManagement();
+    }
+
+    async function loadOrders() {
+      const res = await fetch('/api/orders');
+      const data = await res.json();
+
+      document.getElementById('statRevenue').textContent = `₹${data.stats.totalRevenue}`;
+      document.getElementById('statPreparing').textContent = data.stats.preparing;
+      document.getElementById('statOutForDelivery').textContent = data.stats.outForDelivery;
+      document.getElementById('statTotalOrders').textContent = data.stats.totalOrders;
+
+      const queue = document.getElementById('ordersQueue');
+      if (!data.orders || data.orders.length === 0) {
+        queue.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted)">No active tickets in kitchen.</div>`;
+        return;
+      }
+
+      queue.innerHTML = data.orders.map(o => {
+        const badgeClass = 'badge-' + (o.status ? o.status.replace(/\s+/g, '') : 'Preparing');
+        return `
+          <div class="order-ticket">
+            <div class="ticket-head">
+              <span class="ticket-id">#${escapeHtml(o.id)}</span>
+              <span class="ticket-price">₹${o.price}</span>
+            </div>
+            <div class="ticket-item">
+              <span>${o.emoji || '🍽️'}</span>
+              <span>${escapeHtml(o.itemName)}</span>
+            </div>
+            <div class="ticket-meta">
+              <span>👤 ${escapeHtml(o.customerName)} (${escapeHtml(o.customerEmail || 'Guest')})</span>
+              <span>⏱ ${escapeHtml(o.orderedAt)}</span>
+              <span class="status-badge ${badgeClass}">${escapeHtml(o.status)}</span>
+            </div>
+            <div class="ticket-actions">
+              <button class="btn-action btn-prep" onclick="updateOrderStatus('${o.id}', 'Preparing')">🍳 Preparing</button>
+              <button class="btn-action btn-dispatch" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">🛵 Dispatch</button>
+              <button class="btn-action btn-delivered" onclick="updateOrderStatus('${o.id}', 'Delivered')">✅ Delivered</button>
+              <button class="btn-action btn-delete" onclick="deleteOrder('${o.id}')">✕ Cancel</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateOrderStatus(id, status) {
+      await fetch(`/api/orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      showToast(`Order status updated to "${status}"`);
+      await loadOrders();
+    }
+
+    async function deleteOrder(id) {
+      await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+      showToast('Order ticket cancelled');
+      await loadOrders();
+    }
+
+    async function loadMenuManagement() {
+      const res = await fetch('/api/menu');
+      const items = await res.json();
+      document.getElementById('activeDishesCount').textContent = `${items.length} items`;
+      const list = document.getElementById('menuMgmtList');
+
+      list.innerHTML = items.map(i => `
+        <div class="menu-mgmt-item">
+          <div>
+            <strong>${i.emoji} ${escapeHtml(i.name)}</strong>
+            <span style="color:var(--text-muted);font-size:0.75rem;margin-left:0.5rem">₹${i.price} (${i.category})</span>
+          </div>
+          <button class="btn-action btn-delete" style="padding:0.25rem 0.5rem;font-size:0.72rem" onclick="deleteDish('${i.id}')">✕ Remove</button>
+        </div>
+      `).join('');
+    }
+
+    async function addNewDish(e) {
+      e.preventDefault();
+      const name = document.getElementById('dishName').value;
+      const price = document.getElementById('dishPrice').value;
+      const emoji = document.getElementById('dishEmoji').value;
+      const category = document.getElementById('dishCategory').value;
+
+      await fetch('/api/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, price, emoji, category })
+      });
+
+      document.getElementById('dishName').value = '';
+      showToast(`Added "${name}" to active menu!`);
+      await loadMenuManagement();
+    }
+
+    async function deleteDish(id) {
+      await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+      showToast('Dish removed from menu');
+      await loadMenuManagement();
+    }
+
+    function logout() {
+      localStorage.removeItem('cloudbite_user');
+      window.location.href = '/login';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    }
+
+    checkAuth();
+  </script>
+
+</body>
+</html>

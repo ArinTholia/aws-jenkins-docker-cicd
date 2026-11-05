@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create an Account — CloudBite Cafe</title>
+  <style>
+    :root {
+      --primary: #ff5a1f;
+      --primary-hover: #e04812;
+      --primary-soft: #fff0eb;
+      --bg-page: #fbf9f6;
+      --bg-card: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --danger: #ef4444;
+      --danger-soft: #fee2e2;
+      --success: #16a34a;
+      --success-soft: #dcfce7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-card);
+      border: 1px solid #f1e4d8;
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .brand-icon {
+      font-size: 2.2rem;
+      background: var(--primary-soft);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .brand-header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .brand-header p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+
+    .alert-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.85rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      margin-top: 0.6rem;
+      transition: background 0.15s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    .switch-auth {
+      text-align: center;
+      margin-top: 1.4rem;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .switch-auth a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .switch-auth a:hover {
+      text-decoration: underline;
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 1.25rem;
+    }
+
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="brand-header">
+      <div class="brand-icon">🍔</div>
+      <h1>Create an Account</h1>
+      <p>Register for CloudBite Cafe Portal</p>
+    </div>
+
+    <!-- Error Alert Box -->
+    <div class="alert alert-danger" id="errorAlert"></div>
+
+    <form onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="nameInput" class="form-input" placeholder="e.g. Arin Tholia" required />
+      </div>
+
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" id="emailInput" class="form-input" placeholder="e.g. arin@example.com" required />
+      </div>
+
+      <div class="form-group">
+        <label>Account Role *</label>
+        <select id="roleInput" class="form-input">
+          <option value="Customer">👤 Customer (Order Food & Track Deliveries)</option>
+          <option value="Manager">👨‍🍳 Kitchen Staff / Manager (Manage Orders & Menu)</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="passwordInput" class="form-input" placeholder="••••••••" required />
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <input type="password" id="confirmPasswordInput" class="form-input" placeholder="••••••••" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Create Account</button>
+    </form>
+
+    <div class="switch-auth">
+      Already have an account? <a href="/login">Sign in</a>
+    </div>
+
+    <div class="back-home">
+      <a href="/">← Return to Cafe Menu</a>
+    </div>
+  </div>
+
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const role = document.getElementById('roleInput').value;
+      const password = document.getElementById('passwordInput').value;
+      const confirmPassword = document.getElementById('confirmPasswordInput').value;
+      const alertBox = document.getElementById('errorAlert');
+      const submitBtn = document.getElementById('submitBtn');
+
+      alertBox.style.display = 'none';
+
+      if (password !== confirmPassword) {
+        alertBox.textContent = 'Passwords do not match. Please re-enter.';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      if (password.length < 4) {
+        alertBox.textContent = 'Password must be at least 4 characters long.';
+        alertBox.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registering account...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          alertBox.textContent = data.error || 'Registration failed.';
+          alertBox.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Account';
+          return;
+        }
+
+        // Store user in localStorage
+        localStorage.setItem('cloudbite_user', JSON.stringify(data.user));
+
+        // Redirect based on role!
+        if (data.user.role === 'Manager') {
+          window.location.href = '/dashboard';
+        } else {
+          window.location.href = '/';
+        }
+      } catch (err) {
+        alertBox.textContent = 'Network error during registration.';
+        alertBox.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    }
+  </script>
+
+</body>
+</html>

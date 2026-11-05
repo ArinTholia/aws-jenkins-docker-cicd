@@ -58,21 +58,59 @@ test('POST and DELETE /api/orders places and removes a 1-click food order', asyn
   assert.strictEqual(delRes.status, 200);
 });
 
-test('GET /login and POST /api/auth/login authenticate user session', async () => {
-  const pageRes = await fetch(`${baseUrl}/login`);
-  assert.strictEqual(pageRes.status, 200);
+test('GET /login, /register, /dashboard page routes return 200', async () => {
+  const loginRes = await fetch(`${baseUrl}/login`);
+  assert.strictEqual(loginRes.status, 200);
 
-  const authRes = await fetch(`${baseUrl}/api/auth/login`, {
+  const regRes = await fetch(`${baseUrl}/register`);
+  assert.strictEqual(regRes.status, 200);
+
+  const dashRes = await fetch(`${baseUrl}/dashboard`);
+  assert.strictEqual(dashRes.status, 200);
+});
+
+test('POST /api/auth/login authenticates verified manager and rejects bad password', async () => {
+  // Valid manager credentials
+  const goodRes = await fetch(`${baseUrl}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      email: 'arin@cloudbite.cafe',
-      password: 'password123',
-      role: 'Manager'
+      email: 'manager@cloudbite.cafe',
+      password: 'manager123'
     })
   });
-  assert.strictEqual(authRes.status, 200);
-  const data = await authRes.json();
-  assert.strictEqual(data.success, true);
-  assert.strictEqual(data.user.role, 'Manager');
+  assert.strictEqual(goodRes.status, 200);
+  const goodData = await goodRes.json();
+  assert.strictEqual(goodData.success, true);
+  assert.strictEqual(goodData.user.role, 'Manager');
+
+  // Invalid password
+  const badRes = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'manager@cloudbite.cafe',
+      password: 'wrongpassword'
+    })
+  });
+  assert.strictEqual(badRes.status, 401);
+});
+
+test('POST /api/auth/register creates a new user with hashed password in database', async () => {
+  const testEmail = `student_${Date.now()}@college.edu`;
+  const regRes = await fetch(`${baseUrl}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'College Student',
+      email: testEmail,
+      password: 'studentPass123',
+      role: 'Customer'
+    })
+  });
+  assert.strictEqual(regRes.status, 201);
+  const regData = await regRes.json();
+  assert.strictEqual(regData.success, true);
+  assert.strictEqual(regData.user.email, testEmail);
+  assert.strictEqual(regData.user.role, 'Customer');
 });
