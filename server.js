@@ -509,7 +509,7 @@ app.get('/api/devops-proof', (req, res) => {
     },
     docker: {
       containerId: os.hostname().substring(0, 12),
-      imageName: 'cloudpulse-cicd:latest',
+      imageName: 'cloudbite-cafe:latest',
       dockerfile: safeReadText('Dockerfile')
     },
     aws: {

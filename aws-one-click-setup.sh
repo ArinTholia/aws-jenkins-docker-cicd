@@ -53,10 +53,10 @@ cd /home/ubuntu || cd /tmp
 rm -rf aws-jenkins-docker-cicd
 git clone https://github.com/ArinTholia/aws-jenkins-docker-cicd.git
 cd aws-jenkins-docker-cicd
-sudo docker stop cloudpulse-app || true
-sudo docker rm cloudpulse-app || true
-sudo docker build -t cloudpulse-cicd:latest .
-sudo docker run -d --name cloudpulse-app --restart unless-stopped -p 3000:3000 cloudpulse-cicd:latest
+sudo docker stop cloudbite-cafe-app || true
+sudo docker rm cloudbite-cafe-app || true
+sudo docker build -t cloudbite-cafe:latest .
+sudo docker run -d --name cloudbite-cafe-app --restart unless-stopped -p 3000:3000 cloudbite-cafe:latest
 
 # Fetch AWS EC2 Public IP
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com || hostname -I | awk '{print $1}')

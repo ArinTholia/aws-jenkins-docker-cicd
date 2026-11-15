@@ -1,7 +1,7 @@
 {
-  "name": "cloudpulse-devops-cicd",
+  "name": "cloudbite-cafe-devops",
   "version": "1.0.0",
-  "description": "Dynamic Task & Deployment Manager with Automated CI/CD Pipeline (AWS + Git + Jenkins + Docker)",
+  "description": "CloudBite Cafe — Dynamic Full-Stack Web Application with Automated CI/CD Pipeline (AWS + Git + Jenkins + Docker)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

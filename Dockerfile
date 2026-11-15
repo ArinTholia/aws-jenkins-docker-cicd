@@ -1,5 +1,5 @@
 # ============================================================================
-# Dockerfile — CloudPulse Dynamic Web Application
+# Dockerfile — CloudBite Cafe Dynamic Web Application
 # Tool #4: Docker Containerization for AWS EC2 Deployment
 # ============================================================================
 FROM node:20-alpine

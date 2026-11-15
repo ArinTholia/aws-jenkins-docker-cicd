@@ -6,8 +6,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME     = "cloudpulse-cicd"
-        CONTAINER_NAME = "cloudpulse-app"
+        IMAGE_NAME     = "cloudbite-cafe"
+        CONTAINER_NAME = "cloudbite-cafe-app"
         APP_PORT       = "80"
         AWS_REGION     = "us-east-1"
     }
